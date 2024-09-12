@@ -1,0 +1,41 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\huiswerk\\Jaar 2\\proftaak\\Remote-healthcare\\Remote-healthcare\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{43153B95-AC57-4E1C-B9E8-24B58D4206CD}|Remote-healthcare\\Remote-healthcare.csproj|d:\\huiswerk\\jaar 2\\proftaak\\remote-healthcare\\remote-healthcare\\remote-healthcare\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{43153B95-AC57-4E1C-B9E8-24B58D4206CD}|Remote-healthcare\\Remote-healthcare.csproj|solutionrelative:remote-healthcare\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\huiswerk\\Jaar 2\\proftaak\\Remote-healthcare\\Remote-healthcare\\Remote-healthcare\\Program.cs",
+              "RelativeDocumentMoniker": "Remote-healthcare\\Program.cs",
+              "ToolTip": "D:\\huiswerk\\Jaar 2\\proftaak\\Remote-healthcare\\Remote-healthcare\\Remote-healthcare\\Program.cs",
+              "RelativeToolTip": "Remote-healthcare\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-10T12:00:40.219Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
