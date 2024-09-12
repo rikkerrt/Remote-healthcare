@@ -34,7 +34,6 @@ namespace FietsDemo
 
             // Connecting
             errorCode = errorCode = await bleBike.OpenDevice("Tacx Flux 01249");
-            errorCode = await bleHeart.OpenDevice("Decathlon Dual HR");
             // __TODO__ Error check
 
             var services = bleBike.GetServices;
@@ -45,14 +44,21 @@ namespace FietsDemo
 
             // Set service
             errorCode = await bleBike.SetService("6e40fec1-b5a3-f393-e0a9-e50e24dcca9e");
-            await bleHeart.SetService("HeartRate");
             // __TODO__ error check
 
             // Subscribe
             bleBike.SubscriptionValueChanged += BleBike_SubscriptionValueChanged;
-            bleHeart.SubscriptionValueChanged += BleBike_SubscriptionValueChanged;
             errorCode = await bleBike.SubscribeToCharacteristic("6e40fec2-b5a3-f393-e0a9-e50e24dcca9e");
-            await bleHeart.SubscribeToCharacteristic("HeartRate");
+
+            // Heart rate
+            errorCode =  await bleHeart.OpenDevice("Decathlon Dual HR");
+
+            await bleHeart.SetService("HeartRate");
+
+            bleHeart.SubscriptionValueChanged += BleBike_SubscriptionValueChanged;
+            await bleHeart.SubscribeToCharacteristic("HeartRateMeasurement");
+             
+
             Console.Read();
         }
 
