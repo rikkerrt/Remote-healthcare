@@ -15,6 +15,9 @@ namespace FietsDemo {
         private static double Duration = 0;
         private static int DurationCount = 0;
         private static int lastDurationValue;
+        private static bool test = false;
+        private static double DurationDeviation = 0;
+        private static double DistanceDeviation = 0;
         static async Task Main(string[] args) {
             int errorCode = 0;
             BLE bleBike = new BLE();
@@ -58,20 +61,32 @@ namespace FietsDemo {
             //Console.WriteLine("Received from {0}: {1}, {2}", e.ServiceName,
             //    BitConverter.ToString(e.Data).Replace("-", " "),
             //Encoding.UTF8.GetString(e.Data));
+
             String filter = BitConverter.ToString(e.Data).Replace("-", " ");
+
+            
 
             if (filter.Substring(0, 2).Equals("16")) {
                 Console.WriteLine(filter + "\n");
             }
             else {
                 if (filter.Substring(12, 2).Equals("10")) {
+
+                    if (test == false)
+                    {
+                        Console.WriteLine("Je bent in de IF");
+                        DurationDeviation = GetDuration(filter.Substring(18, 2));
+                        DistanceDeviation = GetDistance(filter.Substring(21, 2));
+                        test = true;
+                    }
+
                     //Console.WriteLine("Afstand: " + GetDistance("aa"));
                     //Console.WriteLine("Snelheid: " + GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2)) + " Km/h");
                     //Console.WriteLine("Tijd: " + GetDuration("ab" + " S"));
 
                     double Speed = GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2));
-                    double Duration = GetDuration(filter.Substring(18, 2));
-                    double Distance = GetDistance(filter.Substring(21, 2));
+                    double Duration = GetDuration(filter.Substring(18, 2))-DurationDeviation;
+                    double Distance = GetDistance(filter.Substring(21, 2))-DistanceDeviation;
 
                     Console.WriteLine("Tijdsduur: " + Duration);
                     Console.WriteLine("Afstand: " + Distance);
@@ -91,16 +106,70 @@ namespace FietsDemo {
         }
 
         private static double GetSpeed(string LSB, string MSB) {
+            //string TotalHexValue = MSB + LSB;
+            //int DecValue = HexToDecimal(TotalHexValue);
+            //Double SpeedInKmH = (DecValue * 0.001) * 3.6;
+            //return SpeedInKmH;
+
+            return Calculations.GetSpeed(LSB, MSB);
+        }
+
+        public static double GetDistance(string distanceValue) {
+
+            //int decValue = HexToDecimal(distanceValue);
+            //if (decValue < lastDistanceValue) {
+            //    DistanceCount = DistanceCount + 1;
+            //}
+            //Distance = decValue + (DistanceCount * 255);
+            //lastDistanceValue = decValue;
+
+            return Calculations.GetDistance(distanceValue);
+
+        }
+
+        public static double GetDuration(string HexDurationValue) {
+
+            //int decValue = HexToDecimal(HexDurationValue);
+            //if (decValue < lastDurationValue) {
+            //    DurationCount = DurationCount + 1;
+            //}
+            //Duration = decValue + (DurationCount * 255);
+            //lastDurationValue = decValue;
+
+            return Calculations.GetDuration(HexDurationValue);
+
+        }
+    }
+    class Calculations
+    {
+        private static double Distance = 0;
+        private static int DistanceCount = 0;
+        private static int lastDistanceValue;
+
+        private static double Duration = 0;
+        private static int DurationCount = 0;
+        private static int lastDurationValue;
+        private static int HexToDecimal(string hexValue)
+        {
+            int decValue = int.Parse(hexValue, System.Globalization.NumberStyles.HexNumber);
+            return decValue;
+
+        }
+
+        public static double GetSpeed(string LSB, string MSB)
+        {
             string TotalHexValue = MSB + LSB;
             int DecValue = HexToDecimal(TotalHexValue);
             Double SpeedInKmH = (DecValue * 0.001) * 3.6;
             return SpeedInKmH;
         }
 
-        public static double GetDistance(string distanceValue) {
+        public static double GetDistance(string distanceValue)
+        {
 
             int decValue = HexToDecimal(distanceValue);
-            if (decValue < lastDistanceValue) {
+            if (decValue < lastDistanceValue)
+            {
                 DistanceCount = DistanceCount + 1;
             }
             Distance = decValue + (DistanceCount * 255);
@@ -110,10 +179,12 @@ namespace FietsDemo {
 
         }
 
-        public static double GetDuration(string HexDurationValue) {
+        public static double GetDuration(string HexDurationValue)
+        {
 
             int decValue = HexToDecimal(HexDurationValue);
-            if (decValue < lastDurationValue) {
+            if (decValue < lastDurationValue)
+            {
                 DurationCount = DurationCount + 1;
             }
             Duration = decValue + (DurationCount * 255);
@@ -122,5 +193,7 @@ namespace FietsDemo {
             return Duration / 4;
 
         }
+
+
     }
 }
