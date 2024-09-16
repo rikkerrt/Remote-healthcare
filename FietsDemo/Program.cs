@@ -8,14 +8,8 @@ using Avans.TI.BLE;
 
 namespace FietsDemo {
     class Program {
-        private static double Distance = 0;
-        private static int DistanceCount = 0;
-        private static int lastDistanceValue;
 
-        private static double Duration = 0;
-        private static int DurationCount = 0;
-        private static int lastDurationValue;
-        private static bool test = false;
+        private static bool FirstRun = false;
         private static double DurationDeviation = 0;
         private static double DistanceDeviation = 0;
         static async Task Main(string[] args) {
@@ -72,12 +66,12 @@ namespace FietsDemo {
             else {
                 if (filter.Substring(12, 2).Equals("10")) {
 
-                    if (test == false)
+                    if (FirstRun)
                     {
                         Console.WriteLine("Je bent in de IF");
                         DurationDeviation = GetDuration(filter.Substring(18, 2));
                         DistanceDeviation = GetDistance(filter.Substring(21, 2));
-                        test = true;
+                        FirstRun = false;
                     }
 
                     //Console.WriteLine("Afstand: " + GetDistance("aa"));
