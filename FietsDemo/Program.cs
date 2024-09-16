@@ -23,10 +23,14 @@ namespace FietsDemo {
 
             // List available devices
             List<String> bleBikeList = bleBike.ListDevices();
-            Console.WriteLine("Devices found: ");
+
+            Simulation simulation = new Simulation();
+            string time = simulation.requestData("time");
+
+            /*Console.WriteLine("Devices found: ");
             foreach (var name in bleBikeList) {
                 Console.WriteLine($"Device: {name}");
-            }
+            }*/
 
             // Connecting
             errorCode = errorCode = await bleBike.OpenDevice("Tacx Flux 00438");
@@ -34,10 +38,10 @@ namespace FietsDemo {
 
             // __TODO__ Error check
 
-            var services = bleBike.GetServices;
+            /*var services = bleBike.GetServices;
             foreach (var service in services) {
                 Console.WriteLine($"Service: {service.Name}");
-            }
+            }*/
 
             // Set service
             errorCode = await bleBike.SetService("6e40fec1-b5a3-f393-e0a9-e50e24dcca9e");
@@ -65,7 +69,7 @@ namespace FietsDemo {
             }
             else {
                 if (filter.Substring(12, 2).Equals("10")) {
-                    //Console.WriteLine("Afstand: " + GetDistance("aa")); sjakie
+                    //Console.WriteLine("Afstand: " + GetDistance("aa")); 
                     //Console.WriteLine("Snelheid: " + GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2)) + " Km/h");
                     //Console.WriteLine("Tijd: " + GetDuration("ab" + " S"));
 
