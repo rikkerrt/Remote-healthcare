@@ -65,7 +65,7 @@ namespace FietsDemo {
             }
             else {
                 if (filter.Substring(12, 2).Equals("10")) {
-                    //Console.WriteLine("Afstand: " + GetDistance("aa"));
+                    //Console.WriteLine("Afstand: " + GetDistance("aa")); sjakie
                     //Console.WriteLine("Snelheid: " + GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2)) + " Km/h");
                     //Console.WriteLine("Tijd: " + GetDuration("ab" + " S"));
 
