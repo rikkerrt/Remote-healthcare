@@ -29,7 +29,7 @@ namespace FietsDemo {
             }
 
             // Connecting
-            errorCode = errorCode = await bleBike.OpenDevice("Tacx Flux 01249");
+            errorCode = errorCode = await bleBike.OpenDevice("Tacx Flux 00438");
             errorCode = await bleHeart.OpenDevice("Decathlon Dual HR");
 
             // __TODO__ Error check
@@ -54,33 +54,34 @@ namespace FietsDemo {
         }
 
         private static void BleBike_SubscriptionValueChanged(object sender, BLESubscriptionValueChangedEventArgs e) {
-            Console.WriteLine("Received from {0}: {1}, {2}", e.ServiceName,
-                BitConverter.ToString(e.Data).Replace("-", " "),
-            Encoding.UTF8.GetString(e.Data));
-            //String filter = BitConverter.ToString(e.Data).Replace("-", " ");
+            //Console.WriteLine("ontvangen");
+            //Console.WriteLine("Received from {0}: {1}, {2}", e.ServiceName,
+            //    BitConverter.ToString(e.Data).Replace("-", " "),
+            //Encoding.UTF8.GetString(e.Data));
+            String filter = BitConverter.ToString(e.Data).Replace("-", " ");
 
-            //if (filter.Substring(0, 2).Equals("16")) {
-            //    Console.WriteLine(filter);
-            //}
-            //else {
-            //    if (filter.Substring(12, 2).Equals("10")) {
-            //        //Console.WriteLine("Afstand: " + GetDistance("aa"));
-            //        //Console.WriteLine("Snelheid: " + GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2)) + " Km/h");
-            //        //Console.WriteLine("Tijd: " + GetDuration("ab" + " S"));
+            if (filter.Substring(0, 2).Equals("16")) {
+                Console.WriteLine(filter + "\n");
+            }
+            else {
+                if (filter.Substring(12, 2).Equals("10")) {
+                    //Console.WriteLine("Afstand: " + GetDistance("aa"));
+                    //Console.WriteLine("Snelheid: " + GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2)) + " Km/h");
+                    //Console.WriteLine("Tijd: " + GetDuration("ab" + " S"));
 
-            //        double Speed = GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2));
-            //        double Duration = GetDuration(filter.Substring(18, 2));
-            //        double Distance = GetDistance(filter.Substring(21, 2));
+                    double Speed = GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2));
+                    double Duration = GetDuration(filter.Substring(18, 2));
+                    double Distance = GetDistance(filter.Substring(21, 2));
 
-            //        Console.WriteLine("Tijdsduur: " + Duration);
-            //        Console.WriteLine("Afstand: " + Distance);
-            //        Console.WriteLine("Snelheid: " + Speed);
-            //    }
+                    Console.WriteLine("Tijdsduur: " + Duration);
+                    Console.WriteLine("Afstand: " + Distance);
+                    Console.WriteLine("Snelheid: " + Speed + "\n");
+                }
 
-            //    else {
-            //        Console.WriteLine(filter);
-            //    }
-            //}
+                else {
+                    Console.WriteLine(filter + "\n");
+                }
+            }
         }
 
         private static int HexToDecimal(string hexValue) {
