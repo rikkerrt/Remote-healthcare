@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Avans.TI.BLE;
+
 
 namespace FietsDemo {
     class Program {
@@ -61,7 +62,7 @@ namespace FietsDemo {
 
             String filter = BitConverter.ToString(e.Data).Replace("-", " ");
 
-            
+
 
             if (filter.Substring(0, 2).Equals("16")) {
                 Console.WriteLine(filter + "\n");
@@ -80,31 +81,32 @@ namespace FietsDemo {
                     //Console.WriteLine("Tijd: " + GetDuration("ab" + " S"));
 
                     double Speed = GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2));
-                    double Duration = GetDuration(filter.Substring(18, 2))-DurationDeviation;
-                    double Distance = GetDistance(filter.Substring(21, 2))-DistanceDeviation;
+                    double Duration = GetDuration(filter.Substring(18, 2)) - DurationDeviation;
+                    double Distance = GetDistance(filter.Substring(21, 2)) - DistanceDeviation;
 
                     Console.WriteLine("Tijdsduur: " + Duration);
                     Console.WriteLine("Afstand: " + Distance);
                     Console.WriteLine("Snelheid: " + Speed + "\n");
-                } else {
+                }
+                else {
                     Console.WriteLine(filter + "\n");
                 }
             }
         }
 
-        
+
         public static void sendResistance(BLE bleBike) {
-       
-            byte[] bytes = { 0xA4, 0x09, 0x4E, 0x05, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};  //laatste veranderen 
+
+            byte[] bytes = { 0xA4, 0x09, 0x4E, 0x05, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };  //laatste veranderen 
 
             byte checkSum = 0x00;
-            for (int i = 0; i < bytes.Length-1; i++) {
+            for (int i = 0; i < bytes.Length - 1; i++) {
                 checkSum ^= bytes[i];
             }
 
             byte[] toSend = new byte[bytes.Length + 1];
             bytes.CopyTo(toSend, 0);
-            toSend[toSend.Length-1] = checkSum;
+            toSend[toSend.Length - 1] = checkSum;
 
             bleBike.WriteCharacteristic("6e40fec3-b5a3-f393-e0a9-e50e24dcca9e", toSend);
             Console.WriteLine("done");
@@ -176,8 +178,7 @@ namespace FietsDemo {
         public static double GetDistance(string distanceValue) {
 
             int decValue = HexToDecimal(distanceValue);
-            if (decValue < lastDistanceValue)
-            {
+            if (decValue < lastDistanceValue) {
                 DistanceCount = DistanceCount + 1;
             }
             Distance = decValue + (DistanceCount * 255);
@@ -190,8 +191,7 @@ namespace FietsDemo {
         public static double GetDuration(string HexDurationValue) {
 
             int decValue = HexToDecimal(HexDurationValue);
-            if (decValue < lastDurationValue)
-            {
+            if (decValue < lastDurationValue) {
                 DurationCount = DurationCount + 1;
             }
             Duration = decValue + (DurationCount * 255);

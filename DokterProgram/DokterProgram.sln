@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Remote-healthcare", "Remote-healthcare\Remote-healthcare.csproj", "{43153B95-AC57-4E1C-B9E8-24B58D4206CD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DokterProgram", "DokterProgram\DokterProgram.csproj", "{FA0C9DE5-C9BD-4DD5-BD5D-2B3F0D9711D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{43153B95-AC57-4E1C-B9E8-24B58D4206CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{43153B95-AC57-4E1C-B9E8-24B58D4206CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{43153B95-AC57-4E1C-B9E8-24B58D4206CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{43153B95-AC57-4E1C-B9E8-24B58D4206CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA0C9DE5-C9BD-4DD5-BD5D-2B3F0D9711D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA0C9DE5-C9BD-4DD5-BD5D-2B3F0D9711D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA0C9DE5-C9BD-4DD5-BD5D-2B3F0D9711D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA0C9DE5-C9BD-4DD5-BD5D-2B3F0D9711D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {A1384EB7-A8C8-459A-AE37-516EDBA4E7FF}
+		SolutionGuid = {43921D36-FC69-4978-82DF-4ABBFECD619C}
 	EndGlobalSection
 EndGlobal
