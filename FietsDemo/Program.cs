@@ -26,7 +26,7 @@ namespace FietsDemo {
             }
 
             // Connecting
-            errorCode = errorCode = await bleBike.OpenDevice("Tacx Flux 00438");
+            errorCode = errorCode = await bleBike.OpenDevice("Tacx Flux 01140");
             errorCode = await bleHeart.OpenDevice("Decathlon Dual HR");
 
             // __TODO__ Error check
@@ -47,7 +47,10 @@ namespace FietsDemo {
             errorCode = await bleBike.SubscribeToCharacteristic("6e40fec2-b5a3-f393-e0a9-e50e24dcca9e");
             await bleHeart.SubscribeToCharacteristic("HeartRate");
 
+            sendResistance(bleBike);
+
             Console.Read();
+
         }
 
         private static void BleBike_SubscriptionValueChanged(object sender, BLESubscriptionValueChangedEventArgs e) {
@@ -65,9 +68,7 @@ namespace FietsDemo {
             }
             else {
                 if (filter.Substring(12, 2).Equals("10")) {
-
-                    if (FirstRun)
-                    {
+                    if (FirstRun) {
                         Console.WriteLine("Je bent in de IF");
                         DurationDeviation = GetDuration(filter.Substring(18, 2));
                         DistanceDeviation = GetDistance(filter.Substring(21, 2));
@@ -85,12 +86,28 @@ namespace FietsDemo {
                     Console.WriteLine("Tijdsduur: " + Duration);
                     Console.WriteLine("Afstand: " + Distance);
                     Console.WriteLine("Snelheid: " + Speed + "\n");
-                }
-
-                else {
+                } else {
                     Console.WriteLine(filter + "\n");
                 }
             }
+        }
+
+        
+        public static void sendResistance(BLE bleBike) {
+       
+            byte[] bytes = { 0xA4, 0x09, 0x4E, 0x05, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};  //laatste veranderen 
+
+            byte checkSum = 0x00;
+            for (int i = 0; i < bytes.Length-1; i++) {
+                checkSum ^= bytes[i];
+            }
+
+            byte[] toSend = new byte[bytes.Length + 1];
+            bytes.CopyTo(toSend, 0);
+            toSend[toSend.Length-1] = checkSum;
+
+            bleBike.WriteCharacteristic("6e40fec3-b5a3-f393-e0a9-e50e24dcca9e", toSend);
+            Console.WriteLine("done");
         }
 
         private static int HexToDecimal(string hexValue) {
@@ -134,8 +151,7 @@ namespace FietsDemo {
 
         }
     }
-    class Calculations
-    {
+    class Calculations {
         private static double Distance = 0;
         private static int DistanceCount = 0;
         private static int lastDistanceValue;
@@ -143,23 +159,21 @@ namespace FietsDemo {
         private static double Duration = 0;
         private static int DurationCount = 0;
         private static int lastDurationValue;
-        private static int HexToDecimal(string hexValue)
-        {
+
+        private static int HexToDecimal(string hexValue) {
             int decValue = int.Parse(hexValue, System.Globalization.NumberStyles.HexNumber);
             return decValue;
 
         }
 
-        public static double GetSpeed(string LSB, string MSB)
-        {
+        public static double GetSpeed(string LSB, string MSB) {
             string TotalHexValue = MSB + LSB;
             int DecValue = HexToDecimal(TotalHexValue);
             Double SpeedInKmH = (DecValue * 0.001) * 3.6;
             return SpeedInKmH;
         }
 
-        public static double GetDistance(string distanceValue)
-        {
+        public static double GetDistance(string distanceValue) {
 
             int decValue = HexToDecimal(distanceValue);
             if (decValue < lastDistanceValue)
@@ -173,8 +187,7 @@ namespace FietsDemo {
 
         }
 
-        public static double GetDuration(string HexDurationValue)
-        {
+        public static double GetDuration(string HexDurationValue) {
 
             int decValue = HexToDecimal(HexDurationValue);
             if (decValue < lastDurationValue)
