@@ -94,6 +94,10 @@ namespace FietsDemo {
             }
         }
 
+        public static void DataReceived(byte[] data) {
+
+        }
+
 
         public static void sendResistance(BLE bleBike) {
 
