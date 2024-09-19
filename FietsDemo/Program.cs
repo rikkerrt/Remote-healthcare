@@ -25,7 +25,7 @@ namespace FietsDemo {
             List<String> bleBikeList = bleBike.ListDevices();
 
             Simulation simulation = new Simulation();
-            string time = simulation.requestData("time");
+            simulation.runSimulation(90);
 
             /*Console.WriteLine("Devices found: ");
             foreach (var name in bleBikeList) {
