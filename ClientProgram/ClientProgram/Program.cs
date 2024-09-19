@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avans.TI.BLE;
 
-
 namespace FietsDemo {
     class Program {
 
@@ -51,7 +50,6 @@ namespace FietsDemo {
             sendResistance(bleBike);
 
             Console.Read();
-
         }
 
         private static void BleBike_SubscriptionValueChanged(object sender, BLESubscriptionValueChangedEventArgs e) {
@@ -61,8 +59,6 @@ namespace FietsDemo {
             //Encoding.UTF8.GetString(e.Data));
 
             String filter = BitConverter.ToString(e.Data).Replace("-", " ");
-
-
 
             if (filter.Substring(0, 2).Equals("16")) {
                 Console.WriteLine(filter + "\n");
@@ -81,12 +77,13 @@ namespace FietsDemo {
                     //Console.WriteLine("Tijd: " + GetDuration("ab" + " S"));
 
                     double Speed = GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2));
+                    Console.WriteLine(Speed);
                     double Duration = GetDuration(filter.Substring(18, 2)) - DurationDeviation;
                     double Distance = GetDistance(filter.Substring(21, 2)) - DistanceDeviation;
 
-                    Console.WriteLine("Tijdsduur: " + Duration);
-                    Console.WriteLine("Afstand: " + Distance);
-                    Console.WriteLine("Snelheid: " + Speed + "\n");
+                    //Console.WriteLine("Tijdsduur: " + Duration);
+                    //Console.WriteLine("Afstand: " + Distance);
+                    //Console.WriteLine("Snelheid: " + Speed + "\n");
                 }
                 else {
                     Console.WriteLine(filter + "\n");
@@ -94,8 +91,35 @@ namespace FietsDemo {
             }
         }
 
-        public static void DataReceived(byte[] data) {
+        public static void DataReceived(string data) {
+            if (data.Substring(0, 2).Equals("16")) {
+                Console.WriteLine(data + "\n");
+            }
+            else {
+                if (data.Substring(12, 2).Equals("10")) {
+                    if (FirstRun) {
+                        Console.WriteLine("Je bent in de IF");
+                        DurationDeviation = GetDuration(data.Substring(18, 2));
+                        DistanceDeviation = GetDistance(data.Substring(21, 2));
+                        FirstRun = false;
+                    }
 
+                    //Console.WriteLine("Afstand: " + GetDistance("aa"));
+                    //Console.WriteLine("Snelheid: " + GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2)) + " Km/h");
+                    //Console.WriteLine("Tijd: " + GetDuration("ab" + " S"));
+
+                    double Speed = GetSpeed(data.Substring(24, 2), data.Substring(27, 2));
+                    double Duration = GetDuration(data.Substring(18, 2)) - DurationDeviation;
+                    double Distance = GetDistance(data.Substring(21, 2)) - DistanceDeviation;
+
+                    Console.WriteLine("Tijdsduur: " + Duration);
+                    Console.WriteLine("Afstand: " + Distance);
+                    Console.WriteLine("Snelheid: " + Speed + "\n");
+                }
+                else {
+                    Console.WriteLine(data + "\n");
+                }
+            }
         }
 
 
@@ -204,7 +228,5 @@ namespace FietsDemo {
             return Duration / 4;
 
         }
-
-
     }
 }
