@@ -196,12 +196,15 @@ namespace FietsDemo {
 
         }
 
-        public static double GetSpeed(string LSB, string MSB) {
-            string TotalHexValue = MSB + LSB;
-            int DecValue = HexToDecimal(TotalHexValue);
-            Double SpeedInKmH = (DecValue * 0.001) * 3.6;
+        public static double GetSpeed(string LSB, string MSB)
+        {
+            string TotalHexValue = LSB + MSB;
+
+            int DecValue = Convert.ToInt32(TotalHexValue,16);
+            double SpeedInKmH = DecValue * 3.6;
             return SpeedInKmH;
         }
+            
 
         public static double GetDistance(string distanceValue) {
 

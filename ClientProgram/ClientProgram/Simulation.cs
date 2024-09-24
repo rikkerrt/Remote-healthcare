@@ -11,6 +11,7 @@ namespace ClientProgram {
 
             Console.WriteLine("what is the speed?");
             int speed = int.Parse(Console.ReadLine());
+            string speedString = speed.ToString("X4");
 
             Console.WriteLine("What is the heartrate");
             int heartrate = int.Parse(Console.ReadLine());
@@ -18,20 +19,19 @@ namespace ClientProgram {
             
             int time = 00;
 
-            string speedString = speed.ToString("X");
             int differnce = 4 - speedString.Length;
 
-            for (int i = 0; differnce > i; i++) {
+            /*for (int i = 0; differnce > i; i++) {
                 speedString =  "0" + speedString;
                 Console.WriteLine(speedString);
-            }
+            }*/
 
 
             string LSB = speedString.Substring(0, 2);
             string MSB = speedString.Substring(2);
 
-            Console.WriteLine(LSB);
-            Console.WriteLine(MSB);
+            //Console.WriteLine(LSB);
+            //Console.WriteLine(MSB);
 
             while (true) {
                 time ++;
