@@ -91,7 +91,7 @@ namespace FietsDemo {
             }
         }
 
-        public static void DataReceived(string data) {
+        private static void DataReceived(string data) {
             if (data.Substring(0, 2).Equals("16")) {
                 Console.WriteLine(data + "\n");
             }
@@ -140,42 +140,25 @@ namespace FietsDemo {
             Console.WriteLine("done");
         }
 
-        private static int HexToDecimal(string hexValue) {
+        private static int HexToDecimal(string hexValue)
+        {
             int decValue = int.Parse(hexValue, System.Globalization.NumberStyles.HexNumber);
             return decValue;
 
         }
 
-        private static double GetSpeed(string LSB, string MSB) {
-            //string TotalHexValue = MSB + LSB;
-            //int DecValue = HexToDecimal(TotalHexValue);
-            //Double SpeedInKmH = (DecValue * 0.001) * 3.6;
-            //return SpeedInKmH;
+        public static double GetSpeed(string LSB, string MSB) {
 
             return Calculations.GetSpeed(LSB, MSB);
         }
 
         public static double GetDistance(string distanceValue) {
 
-            //int decValue = HexToDecimal(distanceValue);
-            //if (decValue < lastDistanceValue) {
-            //    DistanceCount = DistanceCount + 1;
-            //}
-            //Distance = decValue + (DistanceCount * 255);
-            //lastDistanceValue = decValue;
-
             return Calculations.GetDistance(distanceValue);
 
         }
 
         public static double GetDuration(string HexDurationValue) {
-
-            //int decValue = HexToDecimal(HexDurationValue);
-            //if (decValue < lastDurationValue) {
-            //    DurationCount = DurationCount + 1;
-            //}
-            //Duration = decValue + (DurationCount * 255);
-            //lastDurationValue = decValue;
 
             return Calculations.GetDuration(HexDurationValue);
 
