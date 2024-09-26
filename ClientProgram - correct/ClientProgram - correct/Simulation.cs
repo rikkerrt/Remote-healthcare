@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ClientProgram {
@@ -16,7 +17,7 @@ namespace ClientProgram {
             Console.WriteLine("What is the heartrate");
             int heartrate = int.Parse(Console.ReadLine());
             string heartrateHexString = heartrate.ToString("X2");
-            
+
             int time = 00;
 
             int differnce = 4 - speedString.Length;
@@ -34,11 +35,11 @@ namespace ClientProgram {
             //Console.WriteLine(MSB);
 
             while (true) {
-                time ++;
-                string Fietsdata = "A4 09 4E 05 10 19 " + time.ToString("X2") + " 00 " + LSB + " " + MSB  + " " + heartrateHexString + " 24 84";
+                time++;
+                string Fietsdata = "A4 09 4E 05 10 19 " + time.ToString("X2") + " 00 " + LSB + " " + MSB + " " + heartrateHexString + " 24 84";
 
                 Console.WriteLine(Fietsdata);
-                FietsDemo.Program.DataReceived(Fietsdata);
+                Program.DataReceived(Fietsdata);
                 Thread.Sleep(1000);
             }
         }
