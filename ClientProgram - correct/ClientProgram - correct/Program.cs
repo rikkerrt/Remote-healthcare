@@ -14,7 +14,7 @@ namespace FietsDemo {
         private static double DurationDeviation = 0;
         private static double DistanceDeviation = 0;
         static async Task Main(string[] args) {
-            //new Simulation();
+            Simulation simulation = new Simulation();
             int errorCode = 0;
             BLE bleBike = new BLE();
             BLE bleHeart = new BLE();
