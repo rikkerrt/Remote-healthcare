@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avans.TI.BLE;
 using ClientProgram;
+using ClientProgram___correct;
 
 namespace FietsDemo {
     class Program {
@@ -14,7 +15,11 @@ namespace FietsDemo {
         private static double DurationDeviation = 0;
         private static double DistanceDeviation = 0;
         static async Task Main(string[] args) {
-            Simulation simulation = new Simulation();
+            //Simulation simulation = new Simulation();
+            VRConnection connection = new VRConnection();
+            VRConnection.createData();
+            Console.WriteLine(VRConnection.recieveData() + VRConnection.recieveData());
+            
             int errorCode = 0;
             BLE bleBike = new BLE();
             BLE bleHeart = new BLE();
