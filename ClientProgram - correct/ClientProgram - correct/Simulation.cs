@@ -1,4 +1,5 @@
-﻿using FietsDemo;
+﻿using ClientProgram___correct;
+using FietsDemo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +8,19 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace ClientProgram {
-    class Simulation {
-        static Simulation() {
+    class Simulation : IBike {
 
+        private string Speed = "00";
+        private string Distance = "00";
+        private string Duration = "00";
+        private string HeartBeat = "00";
+        public Simulation() {
+            Thread simulation = new Thread(new ThreadStart(run));
+            simulation.Start();
+        }
+
+        public void run()
+        {
             Console.WriteLine("what is the speed?");
             int speed = int.Parse(Console.ReadLine());
             string speedString = speed.ToString("X4");
@@ -34,14 +45,35 @@ namespace ClientProgram {
             //Console.WriteLine(LSB);
             //Console.WriteLine(MSB);
 
-            while (true) {
+            while (true)
+            {
                 time++;
                 string Fietsdata = "A4 09 4E 05 10 19 " + time.ToString("X2") + " 00 " + LSB + " " + MSB + " " + heartrateHexString + " 24 84";
 
                 Console.WriteLine(Fietsdata);
-                Program.DataReceived(Fietsdata);
+                //Program.DataReceived(Fietsdata);
                 Thread.Sleep(1000);
             }
+        }
+        
+        public static string getSpeed()
+        {
+            return "speed";
+        }
+
+        public string getDistance()
+        {
+            return "distance";
+        }
+
+        public string getDuration()
+        {
+            return "duration";
+        }
+
+        public string getHeartBeat()
+        {
+            return "heartBeat";
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ClientProgram {
-    class Simulation {
+    class Simulation : IBike { 
         static Simulation() {
 
             Console.WriteLine("what is the speed?");
@@ -42,5 +42,26 @@ namespace ClientProgram {
                 Thread.Sleep(1000);
             }
         }
+
+        public String getSpeed()
+        {
+            return "speed";
+        }
+
+        public String getDistance()
+        {
+            return "distance";
+        }
+
+        public String getDuration()
+        {
+            return "duration";
+        }
+
+        public String getHeartBeat()
+        {
+            return "heartbeat";
+        }
+
     }
 }
