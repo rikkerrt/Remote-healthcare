@@ -34,6 +34,13 @@ namespace ClientProgram___correct {
             prepend = new byte[] {(byte)jsonPacket.Length, 0x00, 0x00, 0x00};
             SendPacket(prepend, data);
         }
+        public static void createTunnel()
+        {
+            string jsonPacket = "{\"id\" : \"tunnel/create\"}";
+            data = Encoding.ASCII.GetBytes(jsonPacket);
+            prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
+            SendPacket(prepend, data);
+        }
 
         public static string recieveData() {
             byte[] buffer = new byte[1000];

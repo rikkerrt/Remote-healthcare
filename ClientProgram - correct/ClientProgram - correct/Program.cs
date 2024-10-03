@@ -18,6 +18,7 @@ namespace FietsDemo {
             //Simulation simulation = new Simulation();
             VRConnection connection = new VRConnection();
             VRConnection.createData();
+            VRConnection.createTunnel();
             Console.WriteLine(VRConnection.recieveData() + VRConnection.recieveData());
             
             int errorCode = 0;
