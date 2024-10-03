@@ -1,21 +1,20 @@
-﻿using ClientProgram___correct;
+using ClientProgram___correct;
 using FietsDemo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace ClientProgram {
-    class Simulation : IBike {
+    class Simulation {
+        static Simulation() {
 
-        private string Speed = "0000";
-        private string Distance = "00";
-        private int Duration = 00;
-        private string HeartBeat = "00";
-        private int Mode;
-        private Random r = new Random();
+            Console.WriteLine("what is the speed?");
+            int speed = int.Parse(Console.ReadLine());
+            string speedString = speed.ToString("X4");
 
         public Simulation(int mode) {
             Mode = mode;
