@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace ClientProgram {
     class Simulation : IBike {
 
-        private string Speed = "00";
+        private int Speed = 0;
         private string Distance = "00";
         private string Duration = "00";
         private string HeartBeat = "00";
@@ -48,7 +48,7 @@ namespace ClientProgram {
             while (true)
             {
                 time++;
-                Speed = time + " s";
+                Speed++;
                 Console.WriteLine(Speed);
                 string Fietsdata = "A4 09 4E 05 10 19 " + time.ToString("X2") + " 00 " + LSB + " " + MSB + " " + heartrateHexString + " 24 84";
 
@@ -60,7 +60,7 @@ namespace ClientProgram {
         
         public string getSpeed()
         {
-            return Speed;
+            return Speed + "";
         }
 
         public string getDistance()

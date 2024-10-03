@@ -19,7 +19,7 @@ namespace FietsDemo {
             Console.WriteLine(connection.getSpeed());
             while (true)
             {
-                Console.WriteLine(connection.getSpeed());
+                //Console.WriteLine(connection.getSpeed());
             }
         }
 
