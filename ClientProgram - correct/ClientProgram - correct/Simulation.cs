@@ -48,6 +48,8 @@ namespace ClientProgram {
             while (true)
             {
                 time++;
+                Speed = time + " s";
+                Console.WriteLine(Speed);
                 string Fietsdata = "A4 09 4E 05 10 19 " + time.ToString("X2") + " 00 " + LSB + " " + MSB + " " + heartrateHexString + " 24 84";
 
                 Console.WriteLine(Fietsdata);
@@ -56,9 +58,9 @@ namespace ClientProgram {
             }
         }
         
-        public static string getSpeed()
+        public string getSpeed()
         {
-            return "speed";
+            return Speed;
         }
 
         public string getDistance()

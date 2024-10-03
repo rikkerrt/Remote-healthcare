@@ -135,7 +135,7 @@ namespace ClientProgram___correct
 
         }
 
-        public static string getSpeed()
+        public string getSpeed()
         {
             return Connection.Speed;
         }
