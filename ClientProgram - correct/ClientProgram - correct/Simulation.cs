@@ -10,72 +10,145 @@ using System.Threading.Tasks;
 namespace ClientProgram {
     class Simulation : IBike {
 
-        private int Speed = 0;
+        private string Speed = "0000";
         private string Distance = "00";
-        private string Duration = "00";
+        private int Duration = 00;
         private string HeartBeat = "00";
-        public Simulation() {
+        private int Mode;
+        private Random r = new Random();
+
+        public Simulation(int mode) {
+            Mode = mode;
             Thread simulation = new Thread(new ThreadStart(run));
             simulation.Start();
         }
 
         public void run()
         {
-            Console.WriteLine("what is the speed?");
-            int speed = int.Parse(Console.ReadLine());
-            string speedString = speed.ToString("X4");
-
-            Console.WriteLine("What is the heartrate");
-            int heartrate = int.Parse(Console.ReadLine());
-            string heartrateHexString = heartrate.ToString("X2");
-
-            int time = 00;
-
-            int differnce = 4 - speedString.Length;
-
-            /*for (int i = 0; differnce > i; i++) {
-                speedString =  "0" + speedString;
-                Console.WriteLine(speedString);
-            }*/
-
-
-            string LSB = speedString.Substring(0, 2);
-            string MSB = speedString.Substring(2);
-
-            //Console.WriteLine(LSB);
-            //Console.WriteLine(MSB);
-
             while (true)
             {
-                time++;
-                Speed++;
-                Console.WriteLine(Speed);
-                string Fietsdata = "A4 09 4E 05 10 19 " + time.ToString("X2") + " 00 " + LSB + " " + MSB + " " + heartrateHexString + " 24 84";
+                if (Mode == 1)
+                {
+                    ModeOne();
+                }
+                else if (Mode == 2)
+                {
+                    ModeTwo();
+                }
+                else if (Mode == 3)
+                {
+                    ModeThree();
+                }
+
+
+                string Fietsdata = "A4 09 4E 05 10 19 " + Duration.ToString("X2") + " 00 " + Speed + " " + Speed + " " + HeartBeat + " 24 84";
 
                 Console.WriteLine(Fietsdata);
                 //Program.DataReceived(Fietsdata);
                 Thread.Sleep(1000);
             }
         }
-        
+
+        public void ModeOne() {
+            Speed = "1111";
+            Distance = "11";
+            Duration++;
+            HeartBeat = "32";
+        }
+
+        public void ModeTwo()
+        {
+            int randomSpeed = r.Next(0, 65535);
+            int randomDistance = r.Next(0, 255);
+            Duration++;
+            int randomHeartBeat = r.Next(0, 255);
+
+            Speed = randomSpeed.ToString("X");
+            Distance = randomDistance.ToString("X");
+            HeartBeat = randomHeartBeat.ToString("X");
+
+            Speed = fillHex(Speed, 4);
+            Distance = fillHex(Distance, 2);
+            HeartBeat = fillHex(HeartBeat, 2);
+
+        }
+
+        public void ModeThree()
+        {
+            int randomSpeed = r.Next(0, 10);
+            int randomDistance = r.Next(0, 255);
+            Duration++;
+            int randomHeartBeat = r.Next(0, 10);
+
+            int speed;
+            int heartBeat;
+
+            if (r.Next(0, 2) == 0)
+            {
+                speed = Convert.ToInt32(Speed, 16) + randomSpeed;
+                if (speed > 65535)
+                {
+                    speed = 65535;
+                }
+                heartBeat = Convert.ToInt32(HeartBeat, 16) + randomHeartBeat;
+                if (heartBeat > 255)
+                {
+                    heartBeat = 255;
+                }
+            } else
+            {
+                speed = Convert.ToInt32(Speed, 16) - randomSpeed;
+                if (speed < 0)
+                {
+                    speed = 0;
+                }
+                heartBeat = Convert.ToInt32(HeartBeat, 16) - randomHeartBeat;
+                if (heartBeat > 0)
+                {
+                    heartBeat = 0;
+                }
+            }
+
+            Speed = speed.ToString("X");
+            Distance = randomDistance.ToString("X");
+            HeartBeat = heartBeat.ToString("X");
+
+            Speed = fillHex(Speed, 4);
+            Distance = fillHex(Distance, 2);
+            HeartBeat = fillHex(HeartBeat, 2);
+        }
+
+        public string fillHex(string value, int max)
+        {
+            string input = value;
+            while (input.Length < max)
+            {
+                input = "0" + input;
+            }
+            return input;
+        }
+
+
+
+
         public string getSpeed()
         {
-            return Speed + "";
+            return Speed;
         }
 
         public string getDistance()
         {
-            return "distance";
+            return Distance;
         }
 
         public string getDuration()
         {
-            return "duration";
+            return Duration + "";
         }
 
         public string getHeartBeat()
         {
-            return "heartBeat";
+            return HeartBeat;
         }
     }
 }
