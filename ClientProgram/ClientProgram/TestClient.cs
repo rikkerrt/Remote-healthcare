@@ -1,6 +1,3 @@
-﻿using System.Net.Sockets;
-using System.Net;
-using System.Text;
 
 //using System.Net.Sockets;
 //using System.Net;
@@ -14,6 +11,9 @@ using System.Text;
 
 //var buffer = new byte[1_024];
 //int received = await stream.ReadAsync(buffer);
+
+//var message = Encoding.UTF8.GetString(buffer, 0, received);
+//Console.WriteLine($"Message received: \"{message}\"");
 
 //var message = Encoding.UTF8.GetString(buffer, 0, received);
 //Console.WriteLine($"Message received: \"{message}\"");

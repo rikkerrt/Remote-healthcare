@@ -1,13 +1,13 @@
-﻿using FietsDemo;
+using FietsDemo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-//namespace ClientProgram {
-//    internal class Simulation {
-//        static void Main(string[] args) {
+namespace ClientProgram {
+    class Simulation {
+        static Simulation() {
 
 //            Console.WriteLine("what is the speed?");
 //            int speed = int.Parse(Console.ReadLine());
@@ -37,10 +37,10 @@ using System.Threading.Tasks;
 //                time ++;
 //                string Fietsdata = "A4 09 4E 05 10 19 " + time.ToString("X2") + " 00 " + LSB + " " + MSB  + " " + heartrateHexString + " 24 84";
 
-//                Console.WriteLine(Fietsdata);
-//                //Program.DataReceived(Fietsdata);
-//                Thread.Sleep(1000);
-//            }
-//        }
-//    }
-//}
+                Console.WriteLine(Fietsdata);
+                FietsDemo.Program.DataReceived(Fietsdata);
+                Thread.Sleep(1000);
+            }
+        }
+    }
+}

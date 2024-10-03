@@ -14,7 +14,7 @@ namespace FietsDemo {
         private static double DurationDeviation = 0;
         private static double DistanceDeviation = 0;
         static async Task Main(string[] args) {
-            //new Simulation();
+            Simulation simulation = new Simulation();
             int errorCode = 0;
             BLE bleBike = new BLE();
             BLE bleHeart = new BLE();
@@ -93,7 +93,7 @@ namespace FietsDemo {
             }
         }
 
-        private static void DataReceived(string data) {
+        public static void DataReceived(string data) {
             if (data.Substring(0, 2).Equals("16")) {
                 Console.WriteLine(data + "\n");
             }
@@ -142,25 +142,42 @@ namespace FietsDemo {
             Console.WriteLine("done");
         }
 
-        private static int HexToDecimal(string hexValue)
-        {
+        private static int HexToDecimal(string hexValue) {
             int decValue = int.Parse(hexValue, System.Globalization.NumberStyles.HexNumber);
             return decValue;
 
         }
 
-        public static double GetSpeed(string LSB, string MSB) {
+        private static double GetSpeed(string LSB, string MSB) {
+            //string TotalHexValue = MSB + LSB;
+            //int DecValue = HexToDecimal(TotalHexValue);
+            //Double SpeedInKmH = (DecValue * 0.001) * 3.6;
+            //return SpeedInKmH;
 
             return Calculations.GetSpeed(LSB, MSB);
         }
 
         public static double GetDistance(string distanceValue) {
 
+            //int decValue = HexToDecimal(distanceValue);
+            //if (decValue < lastDistanceValue) {
+            //    DistanceCount = DistanceCount + 1;
+            //}
+            //Distance = decValue + (DistanceCount * 255);
+            //lastDistanceValue = decValue;
+
             return Calculations.GetDistance(distanceValue);
 
         }
 
         public static double GetDuration(string HexDurationValue) {
+
+            //int decValue = HexToDecimal(HexDurationValue);
+            //if (decValue < lastDurationValue) {
+            //    DurationCount = DurationCount + 1;
+            //}
+            //Duration = decValue + (DurationCount * 255);
+            //lastDurationValue = decValue;
 
             return Calculations.GetDuration(HexDurationValue);
 
