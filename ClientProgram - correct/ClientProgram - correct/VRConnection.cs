@@ -10,6 +10,8 @@ namespace ClientProgram___correct {
     internal class VRConnection {
         private static TcpClient client = new TcpClient();
         private string _address = "85.145.62.130";
+        private static string encoded;
+        private static string send;
         private int _port;
 
         private static NetworkStream networkStream;
@@ -36,7 +38,7 @@ namespace ClientProgram___correct {
         }
         public static void createTunnel()
         {
-            string jsonPacket = "{\"id\" : \"tunnel/create\"}";
+            string jsonPacket = "{\"id\" : \"tunnel/create\", \"data\" : {\"session\" : \"18818146-9d98-48e6-8868-463dfd974ede\", \"key\" : \"\"}}";
             data = Encoding.ASCII.GetBytes(jsonPacket);
             prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
             SendPacket(prepend, data);
@@ -45,7 +47,15 @@ namespace ClientProgram___correct {
         public static string recieveData() {
             byte[] buffer = new byte[1000];
             int recieved = networkStream.Read(buffer, 0, buffer.Length);
-            return Encoding.ASCII.GetString(buffer, 0, recieved);
+            encoded = encoded + Encoding.ASCII.GetString(buffer, 0, recieved);
+
+            if (!encoded.EndsWith("}}]}")) {
+                recieveData();
+            }
+
+            send = encoded;
+            encoded = "";
+            return send;
         }
     }
 }

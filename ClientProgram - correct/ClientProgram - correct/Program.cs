@@ -10,7 +10,6 @@ using ClientProgram___correct;
 
 namespace FietsDemo {
     class Program {
-
         private static bool FirstRun = false;
         private static double DurationDeviation = 0;
         private static double DistanceDeviation = 0;
@@ -19,7 +18,8 @@ namespace FietsDemo {
             VRConnection connection = new VRConnection();
             VRConnection.createData();
             VRConnection.createTunnel();
-            Console.WriteLine(VRConnection.recieveData() + VRConnection.recieveData());
+            
+            Console.WriteLine(VRConnection.recieveData());
             
             int errorCode = 0;
             BLE bleBike = new BLE();
