@@ -4,13 +4,12 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Security.Policy;
 using System.Text;
-using static System.Collections.Specialized.BitVector32;
 
 namespace ClientProgram___correct {
     internal class VRConnection {
         private static TcpClient client = new TcpClient();
         private string _address = "85.145.62.130";
-        private static string encoded;
+        private static string encoded = "";
         private static string send;
         private int _port;
 
@@ -38,7 +37,7 @@ namespace ClientProgram___correct {
         }
         public static void createTunnel()
         {
-            string jsonPacket = "{\"id\" : \"tunnel/create\", \"data\" : {\"session\" : \"18818146-9d98-48e6-8868-463dfd974ede\", \"key\" : \"\"}}";
+            string jsonPacket = "{\"id\" : \"tunnel/create\", \"data\" : {\"session\" : \"0601d4a1-7070-41da-8f2e-3ad1dd4f73fa\", \"key\" : \"\"}}";
             data = Encoding.ASCII.GetBytes(jsonPacket);
             prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
             SendPacket(prepend, data);
@@ -47,15 +46,7 @@ namespace ClientProgram___correct {
         public static string recieveData() {
             byte[] buffer = new byte[1000];
             int recieved = networkStream.Read(buffer, 0, buffer.Length);
-            encoded = encoded + Encoding.ASCII.GetString(buffer, 0, recieved);
-
-            if (!encoded.EndsWith("}}]}")) {
-                recieveData();
-            }
-
-            send = encoded;
-            encoded = "";
-            return send;
+            return Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length));
         }
     }
 }

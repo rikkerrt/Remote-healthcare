@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.Json; 
 using System.Threading;
 using System.Threading.Tasks;
 using Avans.TI.BLE;
 using ClientProgram;
 using ClientProgram___correct;
+using Newtonsoft.Json.Linq;
 
 namespace FietsDemo {
     class Program {
@@ -18,9 +19,8 @@ namespace FietsDemo {
             VRConnection connection = new VRConnection();
             VRConnection.createData();
             VRConnection.createTunnel();
-            
             Console.WriteLine(VRConnection.recieveData());
-            
+
             int errorCode = 0;
             BLE bleBike = new BLE();
             BLE bleHeart = new BLE();
@@ -236,7 +236,10 @@ namespace FietsDemo {
             lastDurationValue = decValue;
 
             return Duration / 4;
-
         }
+    }
+
+    public class ID {
+        public string id { get; set; }
     }
 }
