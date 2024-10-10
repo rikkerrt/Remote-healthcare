@@ -121,9 +121,48 @@ public class server
 
     public static void HandleDoctor(Socket socket)
     {
-        ASCIIEncoding asen = new ASCIIEncoding();
 
-        socket.Send(asen.GetBytes("Je bent geïntialiseerd als een doctor"));
+        ASCIIEncoding asen = new ASCIIEncoding();
+        socket.Send(asen.GetBytes(i + ""));
+
+        while (true)
+        {
+            try
+            {
+
+                byte[] b = new byte[100];
+                int k = socket.Receive(b);
+                Console.WriteLine("Recieved...");
+
+                String s = System.Text.Encoding.ASCII.GetString(b);
+                Console.WriteLine(s);
+
+
+                if (s.StartsWith("WW"))
+                {
+                    socket.Send(asen.GetBytes("true"));
+
+
+                }
+
+    
+
+                else
+                {
+                    socket.Send(asen.GetBytes("Je bent geïntialiseerd als niks"));
+
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error met ontvangen van data: " + e.Message);
+                break;
+            }
+
+
+        }
+        socket.Close();
+
 
     }
 }

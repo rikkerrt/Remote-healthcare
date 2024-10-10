@@ -98,11 +98,14 @@ namespace FietsDemo
                 this.HeartBeat = heartBeat;
             }
 
-            public int ID { get; set; }
-            public double Speed { get; set; }
-            public double Distance { get; set; }
-            public double Time { get; set; }
-            public int HeartBeat { get; set; }
+        public Data(int id, double speed, double distance, int time, int heartBeat)
+        {
+            this.ID = id;
+            this.Speed = speed;
+            this.Distance = distance;
+            this.Time = time;
+            this.HeartBeat = heartBeat;
+        }
 
             public override string ToString()
             {
