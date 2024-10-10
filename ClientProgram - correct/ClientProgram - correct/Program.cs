@@ -62,7 +62,7 @@ public class Program
         private int time;
         private int heartBeat;
 
-        public Data(int id, double speed, double distance, double time, int heartBeat)
+        public Data(int id, double speed, double distance, int time, int heartBeat)
         {
             this.ID = id;
             this.Speed = speed;
@@ -74,7 +74,7 @@ public class Program
         public int ID { get; set; }
         public double Speed { get; set; }
         public double Distance { get; set; }
-        public double Time { get; set; }
+        public int Time { get; set; }
         public int HeartBeat { get; set; }
 
         public override string ToString()
