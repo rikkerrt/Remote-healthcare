@@ -67,7 +67,7 @@ namespace ClientProgram___correct
 
         public static int getHeartBeat(string HeartBeatValue)
         {
-            return 1;
+            return HexToDecimal(HeartBeatValue);
         }
     }
 }

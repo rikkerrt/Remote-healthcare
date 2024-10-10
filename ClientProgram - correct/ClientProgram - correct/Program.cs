@@ -28,15 +28,15 @@ namespace FietsDemo
         {
             sim = new Simulation(3);
 
-            while (true)
-            {
-                string input = sim.getDistance();
-                //Console.WriteLine(Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2)));
-                //Console.WriteLine(input);
-                Console.WriteLine(Calculations.GetDistance(input));
-                Thread.Sleep(500);
-                //Console.WriteLine();   
-            }
+            //while (true)
+            //{
+            //    string input = sim.getDistance();
+            //    //Console.WriteLine(Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2)));
+            //    //Console.WriteLine(input);
+            //    Console.WriteLine(Calculations.GetDistance(input));
+            //    Thread.Sleep(500);
+            //    //Console.WriteLine();   
+            //}
 
 
             try
