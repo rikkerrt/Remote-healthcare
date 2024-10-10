@@ -50,7 +50,7 @@ namespace ClientProgram___correct
 
         }
 
-        public static double GetDuration(string HexDurationValue)
+        public static int GetDuration(string HexDurationValue)
         {
 
             int decValue = HexToDecimal(HexDurationValue);
@@ -61,7 +61,7 @@ namespace ClientProgram___correct
             Duration = decValue + (DurationCount * 255);
             lastDurationValue = decValue;
 
-            return Duration / 4;
+            return (int)Duration;
 
         }
     }

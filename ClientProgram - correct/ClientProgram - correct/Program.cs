@@ -86,10 +86,10 @@ namespace FietsDemo
             private int id;
             private double speed;
             private double distance;
-            private int time;
+            private double time;
             private int heartBeat;
 
-            public Data(int id, double speed, double distance, double time, int heartBeat)
+            public Data(int id, double speed, double distance, int time, int heartBeat)
             {
                 this.ID = id;
                 this.Speed = speed;
@@ -98,23 +98,16 @@ namespace FietsDemo
                 this.HeartBeat = heartBeat;
             }
 
-        public Data(int id, double speed, double distance, int time, int heartBeat)
-        {
-            this.ID = id;
-            this.Speed = speed;
-            this.Distance = distance;
-            this.Time = time;
-            this.HeartBeat = heartBeat;
-        }
+            public int ID { get; set; }
+            public double Speed { get; set; }
+            public double Distance { get; set; }
+            public int Time { get; set; }
+            public int HeartBeat { get; set; }
 
             public override string ToString()
             {
                 return $"ID: {ID}, Speed: {Speed}, Distance: {Distance}, Time: {Time}, HeartBeat: {HeartBeat}";
             }
         }
-    }
-
-    public class ID {
-        public string id { get; set; }
     }
 }
