@@ -42,6 +42,8 @@ namespace ClientProgram___correct {
             SendPacket(prepend, data);
         }
 
+        
+        //Dit is fucking retarted 
         public static string recieveData() {
             byte[] buffer = new byte[1500];
             Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length)));
