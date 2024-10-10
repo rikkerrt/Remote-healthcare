@@ -1,20 +1,14 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json; 
 using System.Threading;
-using System.Threading.Tasks;
-using Avans.TI.BLE;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Net.Sockets;
 using Newtonsoft.Json;
-using System.Data;
 using ClientProgram___correct;
 using ClientProgram;
-using ClientProgram___correct;
-using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace FietsDemo
 {
@@ -22,8 +16,10 @@ namespace FietsDemo
     {
         static int ID;
 
-        public static void Main()
+        public static async Task Main()
         {
+            await VRConnection.Start();
+
             IBike sim = new Simulation(3);
             while (true)
             {

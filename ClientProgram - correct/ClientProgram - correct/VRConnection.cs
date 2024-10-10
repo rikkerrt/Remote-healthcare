@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Security.Policy;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ClientProgram___correct {
     internal class VRConnection {
         private static TcpClient client = new TcpClient();
-        private string _address = "85.145.62.130";
+        private static string _address = "85.145.62.130";
         private static string encoded = "";
         private static string send;
         private int _port;
@@ -17,9 +18,50 @@ namespace ClientProgram___correct {
         public static byte[] prepend;
         public static byte[] data;
 
-        public VRConnection() {
+        public static async Task Start() {
             client.Connect(_address, 6666);
             networkStream = client.GetStream();
+
+            string jsonPacket = "{\"id\" : \"session/list\"}";
+            data = Encoding.ASCII.GetBytes(jsonPacket);
+            prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00};
+            SendPacket(prepend, data);
+
+            await readLength();
+        }
+
+
+        private static async Task readLength() {
+            byte[] length = new byte[4];
+            int PrependLenght = 0;
+            while (PrependLenght < 4) { 
+                 int dataPrependRead = await networkStream.ReadAsync(length, 0, length.Length);
+                PrependLenght += dataPrependRead;
+                Console.WriteLine(PrependLenght);
+            }
+            int lengthInt = BitConverter.ToInt32(length,0);
+            byte[] dataBuuffer =  new byte[lengthInt];
+            Console.WriteLine(lengthInt);
+            PrependLenght = 0;
+            while (PrependLenght < lengthInt) {
+                int bytesread = await networkStream.ReadAsync(dataBuuffer, 0, lengthInt - PrependLenght);
+                PrependLenght += bytesread;
+            }
+            string dataString = Encoding.UTF8.GetString(dataBuuffer);
+            Console.WriteLine(dataString);
+          
+
+             
+            byte[] payload = new byte[lengthInt];
+            int data = await networkStream.ReadAsync(payload, 0, payload.Length);
+
+            Console.WriteLine(Encoding.UTF8.GetString(payload));
+
+        }
+
+
+        public VRConnection() {
+           
         }
 
         public static void SendPacket(byte[] prepend, byte[] data) {
@@ -46,6 +88,7 @@ namespace ClientProgram___correct {
         //Dit is fucking retarted 
         public static string recieveData() {
             byte[] buffer = new byte[1500];
+            Console.WriteLine(networkStream.Read(buffer, 0, buffer.Length));
             Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length)));
             return Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length));
         }
