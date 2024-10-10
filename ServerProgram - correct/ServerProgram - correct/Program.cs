@@ -14,7 +14,7 @@ public class server
     {
         try
         {
-            Data data = new Data(10, 1.1, 2.2, 10.12, 3);
+            Data data = new Data(10, 1.1, 2.2, 10, 3);
             TcpListener myList = new TcpListener(IPAddress.Any, 8001);
             myList.Start();
             Console.WriteLine("The server is running at port 8001...");

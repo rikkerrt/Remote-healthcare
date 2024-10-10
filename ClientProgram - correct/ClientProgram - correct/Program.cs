@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System.Data;
 using ClientProgram___correct;
 using ClientProgram;
+using System.Threading;
 
 namespace FietsDemo
 {
@@ -17,11 +18,12 @@ namespace FietsDemo
         public static void Main()
         {
             IBike sim = new Simulation(3);
-
             while (true)
             {
                 string input = sim.getSpeed();
-                Console.WriteLine(Calculations.GetSpeed(input.Substring(0, 2), input.Substring(2)));
+                Console.WriteLine(Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2)));
+                Thread.Sleep(500);
+                //Console.WriteLine();   
             }
 
 
@@ -45,9 +47,17 @@ namespace FietsDemo
                 StreamWriter writer = new StreamWriter(stm);
                 writer.AutoFlush = true;
 
+                //IBike sim = new Simulation(1);
+
                 while (true)
                 {
                     Data data = new Data(ID, 15, 16, 10, 76);
+
+                    string input = sim.getSpeed();
+                    data.Speed = Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2));
+                    data.Distance = Calculations.GetDistance(sim.getDistance());
+                    data.Time = Calculations.GetDuration(sim.getDuration());
+                    //data.HeartBeat = Calculations.get
 
                     string jsonData = JsonConvert.SerializeObject(data);
                     writer.WriteLine(jsonData);
