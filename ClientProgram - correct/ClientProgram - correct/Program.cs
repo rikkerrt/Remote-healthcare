@@ -21,14 +21,19 @@ namespace FietsDemo
     public class Program
     {
         static int ID;
+        static IBike sim;
+        static StreamWriter writer;
 
         public static void Main()
         {
-            IBike sim = new Simulation(3);
+            sim = new Simulation(3);
+
             while (true)
             {
-                string input = sim.getSpeed();
-                Console.WriteLine(Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2)));
+                string input = sim.getDistance();
+                //Console.WriteLine(Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2)));
+                //Console.WriteLine(input);
+                Console.WriteLine(Calculations.GetDistance(input));
                 Thread.Sleep(500);
                 //Console.WriteLine();   
             }
@@ -51,11 +56,23 @@ namespace FietsDemo
                 int IntResponse = Convert.ToInt32(Respons);
                 ID = IntResponse;
 
-                StreamWriter writer = new StreamWriter(stm);
+                writer = new StreamWriter(stm);
                 writer.AutoFlush = true;
 
                 //IBike sim = new Simulation(1);
 
+                SendData();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error..... " + e.StackTrace);
+            }
+        }
+
+        public static void SendData()
+        {
+            try
+            {
                 while (true)
                 {
                     Data data = new Data(ID, 15, 16, 10, 76);
@@ -64,7 +81,7 @@ namespace FietsDemo
                     data.Speed = Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2));
                     data.Distance = Calculations.GetDistance(sim.getDistance());
                     data.Time = Calculations.GetDuration(sim.getDuration());
-                    //data.HeartBeat = Calculations.get
+                    data.HeartBeat = Calculations.getHeartBeat(sim.getHeartBeat());
 
                     string jsonData = JsonConvert.SerializeObject(data);
                     writer.WriteLine(jsonData);
@@ -73,10 +90,22 @@ namespace FietsDemo
                     System.Threading.Thread.Sleep(10000);
 
                 }
+            } 
+            catch (Exception e) 
+            {
+                Console.WriteLine(e.StackTrace);
+            }
+        }
+
+        public static void RecieveData()
+        {
+            try
+            {
+
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error..... " + e.StackTrace);
+                Console.WriteLine(e.StackTrace);
             }
         }
 

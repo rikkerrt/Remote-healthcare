@@ -194,7 +194,7 @@ namespace ClientProgram {
 
         public string getDuration()
         {
-            return Duration + "";
+            return Duration.ToString("X");
         }
 
         public string getHeartBeat()

@@ -61,8 +61,13 @@ namespace ClientProgram___correct
             Duration = decValue + (DurationCount * 255);
             lastDurationValue = decValue;
 
-            return (int)Duration;
+            return (int)Duration / 4;
 
+        }
+
+        public static int getHeartBeat(string HeartBeatValue)
+        {
+            return 1;
         }
     }
 }
