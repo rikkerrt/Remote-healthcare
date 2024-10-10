@@ -17,9 +17,8 @@ namespace ClientProgram___correct {
         public static byte[] prepend;
         public static byte[] data;
 
-
         public VRConnection() {
-            client.Connect("85.145.62.130", 6666);
+            client.Connect(_address, 6666);
             networkStream = client.GetStream();
         }
 
@@ -44,8 +43,8 @@ namespace ClientProgram___correct {
         }
 
         public static string recieveData() {
-            byte[] buffer = new byte[1000];
-            int recieved = networkStream.Read(buffer, 0, buffer.Length);
+            byte[] buffer = new byte[1500];
+            Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length)));
             return Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length));
         }
     }
