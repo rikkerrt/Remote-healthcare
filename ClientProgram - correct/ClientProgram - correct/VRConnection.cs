@@ -1,9 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.SqlServer.Server;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Security.Policy;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace ClientProgram___correct {
@@ -37,25 +39,27 @@ namespace ClientProgram___correct {
             while (PrependLenght < 4) { 
                  int dataPrependRead = await networkStream.ReadAsync(length, 0, length.Length);
                 PrependLenght += dataPrependRead;
-                Console.WriteLine(PrependLenght);
             }
+
             int lengthInt = BitConverter.ToInt32(length,0);
-            byte[] dataBuuffer =  new byte[lengthInt];
+            byte[] dataBuffer =  new byte[lengthInt];
             Console.WriteLine(lengthInt);
             PrependLenght = 0;
             while (PrependLenght < lengthInt) {
-                int bytesread = await networkStream.ReadAsync(dataBuuffer, 0, lengthInt - PrependLenght);
+                int bytesread = await networkStream.ReadAsync(dataBuffer, 0, lengthInt - PrependLenght);
                 PrependLenght += bytesread;
+                Console.WriteLine("Shitstuck");
             }
-            string dataString = Encoding.UTF8.GetString(dataBuuffer);
+
+            string dataString = Encoding.UTF8.GetString(dataBuffer);
             Console.WriteLine(dataString);
-          
-
              
-            byte[] payload = new byte[lengthInt];
-            int data = await networkStream.ReadAsync(payload, 0, payload.Length);
+            //byte[] payload = new byte[lengthInt];
+            //int data = await networkStream.ReadAsync(payload, 0, payload.Length);
 
-            Console.WriteLine(Encoding.UTF8.GetString(payload));
+
+            //getID(dataString);
+            Console.WriteLine("vrconnection done");
 
         }
 
@@ -91,6 +95,18 @@ namespace ClientProgram___correct {
             Console.WriteLine(networkStream.Read(buffer, 0, buffer.Length));
             Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length)));
             return Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length));
+        }
+
+        public static string getID(string data) {
+                var jsonDocument = JsonDocument.Parse(data);
+
+                if(jsonDocument.RootElement.TryGetProperty("data", out JsonElement dataElement) && 
+                    dataElement.ValueKind == JsonValueKind.Array && 
+                    dataElement.GetArrayLength() >0) {
+                return dataElement[0].GetProperty("id").GetString();
+            }
+
+            return "";
         }
     }
 }
