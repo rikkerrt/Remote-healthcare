@@ -27,7 +27,7 @@ namespace ClientProgram___correct {
 
             string jsonPacket = "{\"id\" : \"session/list\"}";
             data = Encoding.ASCII.GetBytes(jsonPacket);
-            prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00};
+            prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
             SendPacket(prepend, data);
 
             await readLength();
@@ -44,17 +44,21 @@ namespace ClientProgram___correct {
 
             int lengthInt = BitConverter.ToInt32(length,0);
             byte[] dataBuffer =  new byte[lengthInt];
-            Console.WriteLine(lengthInt);
             
-            while (PrependLenght < lengthInt) {
-                int bytesread = await networkStream.ReadAsync(dataBuffer, 0, lengthInt);
-                PrependLenght += bytesread;
-                Console.WriteLine("read");
-            }
+            PrependLenght = 0;
 
+            while (PrependLenght < lengthInt)
+            {
+                Console.WriteLine(lengthInt);
+                int bytesread = await networkStream.ReadAsync(dataBuffer, 0, lengthInt);
+                Console.WriteLine(bytesread);
+                PrependLenght += bytesread;     
+             
+            }
             string dataString = Encoding.UTF8.GetString(dataBuffer);
             Console.WriteLine(dataString);
-            getID(dataString);
+
+            //getID(dataString);
 
             //byte[] payload = new byte[lengthInt];
             //int data = await networkStream.ReadAsync(payload, 0, payload.Length);
