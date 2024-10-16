@@ -53,8 +53,15 @@ namespace ClientProgram___correct {
                 int bytesread = await networkStream.ReadAsync(dataBuffer, 0, lengthInt);
                 Console.WriteLine(bytesread);
                 PrependLenght += bytesread;     
-             
             }
+
+            int readTotal;
+            //collins trying
+            //while ((readTotal = await networkStream.ReadAsync(dataBuffer, 0, dataBuffer.Length)) != 0) {
+            //    string dataString = Encoding.ASCII.GetString(dataBuffer, 0, dataBuffer.Length);
+            //    Console.WriteLine(dataString);
+            //}
+
             string dataString = Encoding.UTF8.GetString(dataBuffer);
             Console.WriteLine(dataString);
 
