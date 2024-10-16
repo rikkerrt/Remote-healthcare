@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Security.Policy;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace ClientProgram___correct {
@@ -44,29 +45,24 @@ namespace ClientProgram___correct {
             int lengthInt = BitConverter.ToInt32(length,0);
             byte[] dataBuffer =  new byte[lengthInt];
             Console.WriteLine(lengthInt);
-            PrependLenght = 0;
+            
             while (PrependLenght < lengthInt) {
-                int bytesread = await networkStream.ReadAsync(dataBuffer, 0, lengthInt - PrependLenght);
+                int bytesread = await networkStream.ReadAsync(dataBuffer, 0, lengthInt);
                 PrependLenght += bytesread;
-                Console.WriteLine("Shitstuck");
+                Console.WriteLine("read");
             }
 
             string dataString = Encoding.UTF8.GetString(dataBuffer);
             Console.WriteLine(dataString);
-             
+            getID(dataString);
+
             //byte[] payload = new byte[lengthInt];
             //int data = await networkStream.ReadAsync(payload, 0, payload.Length);
 
-
             //getID(dataString);
             Console.WriteLine("vrconnection done");
-
         }
 
-
-        public VRConnection() {
-           
-        }
 
         public static void SendPacket(byte[] prepend, byte[] data) {
             byte[] combinedArray = new byte[prepend.Length + data.Length];
@@ -98,15 +94,72 @@ namespace ClientProgram___correct {
         }
 
         public static string getID(string data) {
-                var jsonDocument = JsonDocument.Parse(data);
-
-                if(jsonDocument.RootElement.TryGetProperty("data", out JsonElement dataElement) && 
-                    dataElement.ValueKind == JsonValueKind.Array && 
-                    dataElement.GetArrayLength() >0) {
+            var jsonDocument = JsonDocument.Parse(data);
+       
+            List<JsonData> dataList = JsonConvert.DeserializeObject<List<JsonData>>(data);
+           
+            if (jsonDocument.RootElement.TryGetProperty("data", out JsonElement dataElement) && 
+                dataElement.ValueKind == JsonValueKind.Array && 
+                dataElement.GetArrayLength() >0) {
                 return dataElement[0].GetProperty("id").GetString();
             }
 
+            if(jsonDocument.RootElement.TryGetProperty("data", out JsonElement dataObject) && dataObject.ValueKind == JsonValueKind.Object) {
+                JsonNode jsonnode = System.Text.Json.JsonSerializer.SerializeToNode(dataObject);
+                return jsonnode["id"].GetValue<string>();
+            }
             return "";
         }
+    }
+
+    internal class JsonData {
+        private List<Data> data { get; set; }
+        private string id { get; set; }
+        public JsonData(string id, List<Data> data) {
+            this.data = data;
+            this.id = id;
+        }
+    }
+
+    internal class Data {
+        private string id { get; set; }
+        private  string beginTime { get; set; }
+        private  string lastPing { get; set; }
+        private  List<Fps> fps { get; set; }
+        private  List<string> features { get; set; }
+        private  ClientInfo client{ get; set; }
+
+        public Data(string id, string beginTime, string lastPing, List<Fps> fps, List<string> features, ClientInfo client) {
+            this.id = id;
+            this.beginTime = beginTime;
+            this.lastPing = lastPing;
+            this.fps = fps;
+            this.features = features;
+            this.client = client;
+        }
+    }
+
+    internal class ClientInfo {
+        private string host { get; set; }
+        private string user { get; set; }
+        private string file { get; set; }
+        private string renderer { get; set; }
+
+        public ClientInfo(string host, string user, string file, string renderer) {
+            this.host = host;
+            this.user = user;
+            this.file = file;
+            this.renderer = renderer;
+        }
+    }
+
+    internal class Fps {
+        private long time { get; set; }
+        private double fps { get; set; }
+
+        public Fps(long time, double fps) {
+            this.fps = fps;
+            this.time = time;
+        }    
     }
 }

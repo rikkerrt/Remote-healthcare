@@ -19,6 +19,7 @@ namespace FietsDemo
         public static async Task Main()
         {
             await VRConnection.Start();
+            
 
             IBike sim = new Simulation(3);
             while (true)
