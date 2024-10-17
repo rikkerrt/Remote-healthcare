@@ -76,7 +76,7 @@ namespace FietsDemo
                 Console.WriteLine("Error..... " + e.StackTrace);
             }
         }
-
+        
         [Serializable]
         public class Data
         {

@@ -18,6 +18,8 @@ namespace ClientProgram___correct {
         private static string _address = "85.145.62.130";
         private static string encoded = "";
         private static string send;
+        private static string dataString;
+        private static string id;
         private int _port;
 
         private static NetworkStream networkStream;
@@ -34,6 +36,13 @@ namespace ClientProgram___correct {
             SendPacket(prepend, data);
 
             await readLength();
+            id = getID(dataString);
+
+            Console.WriteLine(id);
+
+            createTunnel(id);
+            await readLength();
+            
         }
 
 
@@ -56,13 +65,13 @@ namespace ClientProgram___correct {
             {
                 int read = await networkStream.ReadAsync(dataBuffer, readTotal, dataBuffer.Length - readTotal);
                 readTotal += read;
-                Console.WriteLine(readTotal);
+                //Console.WriteLine(readTotal);
             } while (readTotal < dataBuffer.Length);
 
-            string dataString = Encoding.UTF8.GetString(dataBuffer,0,readTotal);
-            //Console.WriteLine(Encoding.UTF8.GetString(dataBuffer,0,readTotal));
+            dataString = Encoding.UTF8.GetString(dataBuffer,0,readTotal);
+            Console.WriteLine(Encoding.UTF8.GetString(dataBuffer,0,readTotal));
 
-            getID(dataString);
+            
 
             PrependLenght = 0;
 
@@ -96,43 +105,35 @@ namespace ClientProgram___correct {
             Array.Copy(data, 0, combinedArray, prepend.Length, data.Length);
             networkStream.Write(combinedArray, 0, combinedArray.Length);
         }
+
         public static void createData() {
             string jsonPacket = "{\"id\" : \"session/list\"}";
             data = Encoding.ASCII.GetBytes(jsonPacket);
             prepend = new byte[] {(byte)jsonPacket.Length, 0x00, 0x00, 0x00};
             SendPacket(prepend, data);
         }
-        public static void createTunnel()
+        public static void createTunnel(string id)
         {
-            string jsonPacket = "{\"id\" : \"tunnel/create\", \"data\" : {\"session\" : \"0601d4a1-7070-41da-8f2e-3ad1dd4f73fa\", \"key\" : \"\"}}";
+            string jsonPacket = "{\"id\" : \"tunnel/create\", \"data\" : {\"session\" : \"" + id + "\", \"key\" : \"\"}}";
+            Console.WriteLine(jsonPacket);
             data = Encoding.ASCII.GetBytes(jsonPacket);
             prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
+            
             SendPacket(prepend, data);
+           
         }
 
         
-        //Dit is fucking retarted 
-        public static string recieveData() {
+        //Outdated
+        /*public static string recieveData() {
             byte[] buffer = new byte[1500];
             Console.WriteLine(networkStream.Read(buffer, 0, buffer.Length));
             Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length)));
             return Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length));
-        }
+        }*/
 
         public static string getID(string data) {
-            //var jsonDocument = JObject.Parse(data);
-            //Console.WriteLine(jsonDocument.ToString());
-
-            //JArray dataList = JArray.Parse(jsonDocument["data"].ToString());
-            //Console.WriteLine(dataList.ToString());
-            //for(int i = 0; i < dataList.Count; i++)
-            //{
-            //    Console.WriteLine(dataList[i].ToString());
-            //}
-
-            
-            //Console.WriteLine(jsonDocument["data"].ToString());
-            //Console.WriteLine(jsonDocument["id"].ToString());
+            string idHost = "";
        
             JsonData dataList = JsonConvert.DeserializeObject<JsonData>(data);
             List<Data> dataObject = dataList.data;
@@ -143,16 +144,31 @@ namespace ClientProgram___correct {
                     ClientInfo info = data1.clientinfo;
                     if (info.host.ToLower() == System.Net.Dns.GetHostName().ToLower())
                     {
-                        Console.WriteLine(data1.id);
+                        //Console.WriteLine(data1.id);
+                        idHost = data1.id;
                     }
                     else
                     {
-                        Console.WriteLine("Niet de juiste host");
+                        //Console.WriteLine("Niet de juiste host");
                     }
                 }
                 
             }
-           
+            return idHost;
+            //var jsonDocument = JObject.Parse(data);
+            //Console.WriteLine(jsonDocument.ToString());
+
+            //JArray dataList = JArray.Parse(jsonDocument["data"].ToString());
+            //Console.WriteLine(dataList.ToString());
+            //for(int i = 0; i < dataList.Count; i++)
+            //{
+            //    Console.WriteLine(dataList[i].ToString());
+            //}
+
+
+            //Console.WriteLine(jsonDocument["data"].ToString());
+            //Console.WriteLine(jsonDocument["id"].ToString());
+
             /*if (jsonDocument.RootElement.TryGetProperty("data", out JsonElement dataElement) && 
                 dataElement.ValueKind == JsonValueKind.Array && 
                 dataElement.GetArrayLength() >0) {
@@ -163,7 +179,7 @@ namespace ClientProgram___correct {
                 JsonNode jsonnode = System.Text.Json.JsonSerializer.SerializeToNode(dataObject);
                 return jsonnode["id"].GetValue<string>();
             }*/
-            return "";
+
         }
     }
 
