@@ -136,10 +136,21 @@ namespace ClientProgram___correct {
        
             JsonData dataList = JsonConvert.DeserializeObject<JsonData>(data);
             List<Data> dataObject = dataList.data;
+
             foreach (Data data1 in dataObject)
             {
-                ClientInfo info = data1.client;
-                Console.WriteLine(info.ToString());
+                if (data1.features.Contains("tunnel")) {
+                    ClientInfo info = data1.clientinfo;
+                    if (info.host.ToLower() == System.Net.Dns.GetHostName().ToLower())
+                    {
+                        Console.WriteLine(data1.id);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Niet de juiste host");
+                    }
+                }
+                
             }
            
             /*if (jsonDocument.RootElement.TryGetProperty("data", out JsonElement dataElement) && 
@@ -171,7 +182,7 @@ namespace ClientProgram___correct {
         public  string lastPing { get; set; }
         public  List<Fps> fps { get; set; }
         public  List<string> features { get; set; }
-        public  ClientInfo client{ get; set; }
+        public  ClientInfo clientinfo{ get; set; }
 
         public Data(string id, string beginTime, string lastPing, List<Fps> fps, List<string> features, ClientInfo client) {
             this.id = id;
@@ -179,7 +190,7 @@ namespace ClientProgram___correct {
             this.lastPing = lastPing;
             this.fps = fps;
             this.features = features;
-            this.client = client;
+            this.clientinfo = client;
         }
     }
 
