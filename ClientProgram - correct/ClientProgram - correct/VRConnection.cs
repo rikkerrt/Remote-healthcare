@@ -20,6 +20,7 @@ namespace ClientProgram___correct {
         private static string send;
         private static string dataString;
         private static string id;
+        private static string tunnelId;
         private int _port;
 
         private static NetworkStream networkStream;
@@ -38,11 +39,16 @@ namespace ClientProgram___correct {
             await readLength();
             id = getID(dataString);
 
-            Console.WriteLine(id);
+            //Console.WriteLine(id);
 
             createTunnel(id);
             await readLength();
-            
+
+
+            Console.WriteLine(dataString);
+            tunnelId = getTunnelId(dataString);
+            Console.WriteLine(tunnelId);
+           
         }
 
 
@@ -69,11 +75,7 @@ namespace ClientProgram___correct {
             } while (readTotal < dataBuffer.Length);
 
             dataString = Encoding.UTF8.GetString(dataBuffer,0,readTotal);
-            Console.WriteLine(Encoding.UTF8.GetString(dataBuffer,0,readTotal));
-
-            
-
-            PrependLenght = 0;
+            //Console.WriteLine(Encoding.UTF8.GetString(dataBuffer,0,readTotal));
 
             /*while (PrependLenght < lengthInt)
             {
@@ -131,7 +133,17 @@ namespace ClientProgram___correct {
             Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length)));
             return Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length));
         }*/
+        public static string getTunnelId(string tunnelDataString)
+        {
+            string tunnelId = "";
+            JsonTunnelData tunnelDataObj = JsonConvert.DeserializeObject<JsonTunnelData>(tunnelDataString);
 
+            TunnelData tunnelData = tunnelDataObj.data;
+            tunnelId = tunnelData.id;
+            
+
+            return tunnelId;
+        }
         public static string getID(string data) {
             string idHost = "";
        
@@ -182,6 +194,16 @@ namespace ClientProgram___correct {
 
         }
     }
+    internal class JsonTunnelData
+    {
+        public string id { get; set; }
+        public TunnelData data { get; set; }
+        public JsonTunnelData(string id, TunnelData data)
+        {
+            this.data = data;
+            this.id = id;
+        }
+    }
 
     internal class JsonData {
         public List<Data> data { get; set; }
@@ -190,6 +212,17 @@ namespace ClientProgram___correct {
             this.data = data;
             this.id = id;
         }
+    }
+    internal class TunnelData
+    {
+        public string status { get; set; }
+        public string id { get; set; }
+        public TunnelData(string status, string id)
+        {
+            this.status = status;
+            this.id = id;
+        }
+
     }
 
     internal class Data {
