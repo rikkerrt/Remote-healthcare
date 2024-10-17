@@ -108,7 +108,7 @@ namespace ClientProgram {
                     speed = 0;
                 }
                 heartBeat = Convert.ToInt32(HeartBeat, 16) - randomHeartBeat;
-                if (heartBeat > 0)
+                if (heartBeat < 0)
                 {
                     heartBeat = 0;
                 }

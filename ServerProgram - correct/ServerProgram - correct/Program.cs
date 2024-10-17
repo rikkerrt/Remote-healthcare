@@ -52,6 +52,11 @@ public class server
 
         if (s.StartsWith("f"))
         {
+            Thread.Sleep(5000);
+            Console.WriteLine("i have given id");
+            socket1 = socket;
+            Thread dataReciever = new Thread(new ThreadStart(SendD));
+            dataReciever.Start();
             HandleBike(socket);
 
         }
@@ -72,7 +77,7 @@ public class server
 
     }
 
-
+    static Socket socket1;
     public static void HandleBike(Socket socket)
     {
         i++;
@@ -164,6 +169,24 @@ public class server
         socket.Close();
 
 
+    }
+
+    public static void SendD()
+    {
+        try
+        {
+            Thread.Sleep(5000);
+            ASCIIEncoding asen = new ASCIIEncoding();
+            while (true)
+            {
+                socket1.Send(asen.GetBytes("Dokter: hallo"));
+                Thread.Sleep(1000);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 }
 

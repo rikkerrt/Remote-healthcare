@@ -15,6 +15,7 @@ using ClientProgram___correct;
 using ClientProgram;
 using ClientProgram___correct;
 using Newtonsoft.Json.Linq;
+using System.Security.Cryptography;
 
 namespace FietsDemo
 {
@@ -23,6 +24,7 @@ namespace FietsDemo
         static int ID;
         static IBike sim;
         static StreamWriter writer;
+        static Stream stm;
 
         public static void Main()
         {
@@ -46,21 +48,24 @@ namespace FietsDemo
                 tcpclnt.Connect(IPAddress.Loopback, 8001);
                 Console.WriteLine("Connected");
 
-                Stream stm = tcpclnt.GetStream();
+                stm = tcpclnt.GetStream();
                 ASCIIEncoding asen = new ASCIIEncoding();
 
                 stm.Write(asen.GetBytes("f"), 0, asen.GetBytes("f").Length);
                 byte[] buffer = new byte[100];
                 int bytesRead = stm.Read(buffer, 0, buffer.Length);
                 String Respons = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                int IntResponse = Convert.ToInt32(Respons);
-                ID = IntResponse;
+                //int IntResponse = Convert.ToInt32(Respons);
+                ID = Int32.Parse(Respons);
+                Console.WriteLine("i got id");
 
                 writer = new StreamWriter(stm);
                 writer.AutoFlush = true;
 
                 //IBike sim = new Simulation(1);
 
+                Thread dataReciever = new Thread(new ThreadStart(RecieveData));
+                dataReciever.Start();
                 SendData();
             }
             catch (Exception e)
@@ -79,9 +84,13 @@ namespace FietsDemo
 
                     string input = sim.getSpeed();
                     data.Speed = Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2));
+                    Console.WriteLine(data.Speed);
                     data.Distance = Calculations.GetDistance(sim.getDistance());
+                    Console.WriteLine(data.Distance);
                     data.Time = Calculations.GetDuration(sim.getDuration());
+                    Console.WriteLine(data.Time);
                     data.HeartBeat = Calculations.getHeartBeat(sim.getHeartBeat());
+                    Console.WriteLine(data.HeartBeat);
 
                     string jsonData = JsonConvert.SerializeObject(data);
                     writer.WriteLine(jsonData);
@@ -101,7 +110,13 @@ namespace FietsDemo
         {
             try
             {
-
+                while (true)
+                {
+                    byte[] b = new byte[100];
+                    int k = stm.Read(b, 0, b.Length);
+                    string s = System.Text.Encoding.ASCII.GetString(b);
+                    Console.WriteLine(s);
+                }
             }
             catch (Exception e)
             {
