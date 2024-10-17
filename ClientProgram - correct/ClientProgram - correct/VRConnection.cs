@@ -1,9 +1,12 @@
 ﻿using Microsoft.SqlServer.Server;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Sockets;
 using System.Security.Policy;
+using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -34,38 +37,50 @@ namespace ClientProgram___correct {
         }
 
 
+
         private static async Task readLength() {
             byte[] length = new byte[4];
             int PrependLenght = 0;
+            
             while (PrependLenght < 4) { 
-                 int dataPrependRead = await networkStream.ReadAsync(length, 0, length.Length);
+                int dataPrependRead = await networkStream.ReadAsync(length, 0, length.Length);
                 PrependLenght += dataPrependRead;
             }
-
+          
             int lengthInt = BitConverter.ToInt32(length,0);
+            Console.WriteLine(lengthInt);
             byte[] dataBuffer =  new byte[lengthInt];
-            
+
+            int readTotal = 0;
+            do
+            {
+                int read = await networkStream.ReadAsync(dataBuffer, readTotal, dataBuffer.Length - readTotal);
+                readTotal += read;
+                Console.WriteLine(readTotal);
+            } while (readTotal < dataBuffer.Length);
+
+            string dataString = Encoding.UTF8.GetString(dataBuffer,0,readTotal);
+            //Console.WriteLine(Encoding.UTF8.GetString(dataBuffer,0,readTotal));
+
+            getID(dataString);
+
             PrependLenght = 0;
 
-            while (PrependLenght < lengthInt)
+            /*while (PrependLenght < lengthInt)
             {
                 Console.WriteLine(lengthInt);
-                int bytesread = await networkStream.ReadAsync(dataBuffer, 0, lengthInt);
-                Console.WriteLine(bytesread);
-                PrependLenght += bytesread;     
-            }
-
-            int readTotal;
+                int bytesread = await networkStream.ReadAsync(dataBuffer, 0, dataBuffer.Length);
+                Console.WriteLine(PrependLenght);
+                PrependLenght += bytesread;
+            }*/
+            
             //collins trying
             //while ((readTotal = await networkStream.ReadAsync(dataBuffer, 0, dataBuffer.Length)) != 0) {
-            //    string dataString = Encoding.ASCII.GetString(dataBuffer, 0, dataBuffer.Length);
-            //    Console.WriteLine(dataString);
+            //    dataString = Encoding.UTF8.GetString(dataBuffer, 0, dataBuffer.Length);
             //}
 
-            string dataString = Encoding.UTF8.GetString(dataBuffer);
-            Console.WriteLine(dataString);
-
-            //getID(dataString);
+            //string dataString = Encoding.UTF8.GetString(dataBuffer);
+            //Console.WriteLine(dataString);
 
             //byte[] payload = new byte[lengthInt];
             //int data = await networkStream.ReadAsync(payload, 0, payload.Length);
@@ -105,11 +120,16 @@ namespace ClientProgram___correct {
         }
 
         public static string getID(string data) {
-            var jsonDocument = JsonDocument.Parse(data);
+            var jsonDocument = JObject.Parse(data);
+            Console.WriteLine(jsonDocument.ToString());
+
+            
+            //Console.WriteLine(jsonDocument["data"].ToString());
+            //Console.WriteLine(jsonDocument["id"].ToString());
        
-            List<JsonData> dataList = JsonConvert.DeserializeObject<List<JsonData>>(data);
+            //List<JsonData> dataList = JsonConvert.DeserializeObject<List<JsonData>>(data);
            
-            if (jsonDocument.RootElement.TryGetProperty("data", out JsonElement dataElement) && 
+            /*if (jsonDocument.RootElement.TryGetProperty("data", out JsonElement dataElement) && 
                 dataElement.ValueKind == JsonValueKind.Array && 
                 dataElement.GetArrayLength() >0) {
                 return dataElement[0].GetProperty("id").GetString();
@@ -118,7 +138,7 @@ namespace ClientProgram___correct {
             if(jsonDocument.RootElement.TryGetProperty("data", out JsonElement dataObject) && dataObject.ValueKind == JsonValueKind.Object) {
                 JsonNode jsonnode = System.Text.Json.JsonSerializer.SerializeToNode(dataObject);
                 return jsonnode["id"].GetValue<string>();
-            }
+            }*/
             return "";
         }
     }
