@@ -176,7 +176,11 @@ namespace ClientProgram {
             {
                 Duration = 0;
             }
-           
+        }
+
+        public void sendResistance(int resistance)
+        {
+            Console.WriteLine(resistance);
         }
 
 

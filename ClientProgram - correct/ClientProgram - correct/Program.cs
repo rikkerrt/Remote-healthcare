@@ -25,10 +25,13 @@ namespace FietsDemo
         static IBike sim;
         static StreamWriter writer;
         static Stream stm;
+        static DataProtocol dataProtocol;    
 
         public static void Main()
         {
             sim = new Simulation(3);
+            dataProtocol = new DataProtocol(sim); 
+
 
             //while (true)
             //{
@@ -57,7 +60,7 @@ namespace FietsDemo
                 String Respons = Encoding.ASCII.GetString(buffer, 0, bytesRead);
                 //int IntResponse = Convert.ToInt32(Respons);
                 ID = Int32.Parse(Respons);
-                Console.WriteLine("i got id");
+                //Console.WriteLine("i got id");
 
                 writer = new StreamWriter(stm);
                 writer.AutoFlush = true;
@@ -115,7 +118,7 @@ namespace FietsDemo
                     byte[] b = new byte[100];
                     int k = stm.Read(b, 0, b.Length);
                     string s = System.Text.Encoding.ASCII.GetString(b);
-                    Console.WriteLine(s);
+                    
                 }
             }
             catch (Exception e)
