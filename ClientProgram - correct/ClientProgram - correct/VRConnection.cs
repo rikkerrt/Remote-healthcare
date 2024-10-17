@@ -120,14 +120,27 @@ namespace ClientProgram___correct {
         }
 
         public static string getID(string data) {
-            var jsonDocument = JObject.Parse(data);
-            Console.WriteLine(jsonDocument.ToString());
+            //var jsonDocument = JObject.Parse(data);
+            //Console.WriteLine(jsonDocument.ToString());
+
+            //JArray dataList = JArray.Parse(jsonDocument["data"].ToString());
+            //Console.WriteLine(dataList.ToString());
+            //for(int i = 0; i < dataList.Count; i++)
+            //{
+            //    Console.WriteLine(dataList[i].ToString());
+            //}
 
             
             //Console.WriteLine(jsonDocument["data"].ToString());
             //Console.WriteLine(jsonDocument["id"].ToString());
        
-            //List<JsonData> dataList = JsonConvert.DeserializeObject<List<JsonData>>(data);
+            JsonData dataList = JsonConvert.DeserializeObject<JsonData>(data);
+            List<Data> dataObject = dataList.data;
+            foreach (Data data1 in dataObject)
+            {
+                ClientInfo info = data1.client;
+                Console.WriteLine(info.ToString());
+            }
            
             /*if (jsonDocument.RootElement.TryGetProperty("data", out JsonElement dataElement) && 
                 dataElement.ValueKind == JsonValueKind.Array && 
@@ -144,8 +157,8 @@ namespace ClientProgram___correct {
     }
 
     internal class JsonData {
-        private List<Data> data { get; set; }
-        private string id { get; set; }
+        public List<Data> data { get; set; }
+        public string id { get; set; }
         public JsonData(string id, List<Data> data) {
             this.data = data;
             this.id = id;
@@ -153,12 +166,12 @@ namespace ClientProgram___correct {
     }
 
     internal class Data {
-        private string id { get; set; }
-        private  string beginTime { get; set; }
-        private  string lastPing { get; set; }
-        private  List<Fps> fps { get; set; }
-        private  List<string> features { get; set; }
-        private  ClientInfo client{ get; set; }
+        public string id { get; set; }
+        public  string beginTime { get; set; }
+        public  string lastPing { get; set; }
+        public  List<Fps> fps { get; set; }
+        public  List<string> features { get; set; }
+        public  ClientInfo client{ get; set; }
 
         public Data(string id, string beginTime, string lastPing, List<Fps> fps, List<string> features, ClientInfo client) {
             this.id = id;
@@ -171,10 +184,10 @@ namespace ClientProgram___correct {
     }
 
     internal class ClientInfo {
-        private string host { get; set; }
-        private string user { get; set; }
-        private string file { get; set; }
-        private string renderer { get; set; }
+        public string host { get; set; }
+        public string user { get; set; }
+        public string file { get; set; }
+        public string renderer { get; set; }
 
         public ClientInfo(string host, string user, string file, string renderer) {
             this.host = host;
@@ -185,8 +198,8 @@ namespace ClientProgram___correct {
     }
 
     internal class Fps {
-        private long time { get; set; }
-        private double fps { get; set; }
+        public long time { get; set; }
+        public double fps { get; set; }
 
         public Fps(long time, double fps) {
             this.fps = fps;
