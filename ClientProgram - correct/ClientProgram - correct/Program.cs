@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json; 
 using System.Threading;
 using System.Threading.Tasks;
 using Avans.TI.BLE;
@@ -26,6 +25,14 @@ namespace FietsDemo
 
         public static void Main()
         {
+            //IBike sim = new Simulation(3);
+            //while (true)
+            //{
+            //    string input = sim.getSpeed();
+            //    Console.WriteLine(Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2)));
+            //    Thread.Sleep(500);
+            //    //Console.WriteLine();   
+            //}
             sim = new Simulation(3);
 
             //while (true)
@@ -51,10 +58,10 @@ namespace FietsDemo
 
                 stm.Write(asen.GetBytes("f"), 0, asen.GetBytes("f").Length);
                 byte[] buffer = new byte[100];
-                int bytesRead = stm.Read(buffer, 0, buffer.Length);
-                String Respons = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                int IntResponse = Convert.ToInt32(Respons);
-                ID = IntResponse;
+                //int bytesRead = stm.Read(buffer, 0, buffer.Length);
+                //String Respons = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                //int IntResponse = Convert.ToInt32(Respons);
+                //ID = IntResponse;
 
                 writer = new StreamWriter(stm);
                 writer.AutoFlush = true;
@@ -75,7 +82,7 @@ namespace FietsDemo
             {
                 while (true)
                 {
-                    Data data = new Data(ID, 15, 16, 10, 76);
+                    Data data = new Data(ID, 15, 16, 10, 76, 8);
 
                     string input = sim.getSpeed();
                     data.Speed = Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2));
@@ -115,16 +122,18 @@ namespace FietsDemo
             private int id;
             private double speed;
             private double distance;
-            private double time;
+            private int time;
             private int heartBeat;
+            private int resistance;
 
-            public Data(int id, double speed, double distance, int time, int heartBeat)
+            public Data(int id, double speed, double distance, int time, int heartBeat, int resistance)
             {
                 this.ID = id;
                 this.Speed = speed;
                 this.Distance = distance;
                 this.Time = time;
                 this.HeartBeat = heartBeat;
+                this.Resistance = resistance;
             }
 
             public int ID { get; set; }
@@ -132,6 +141,7 @@ namespace FietsDemo
             public double Distance { get; set; }
             public int Time { get; set; }
             public int HeartBeat { get; set; }
+            public int Resistance { get; set; }
 
             public override string ToString()
             {

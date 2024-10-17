@@ -4,17 +4,20 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using ServerProgram___correct;
 
 
 
 public class server
 {
     static int i = 0;
+    public static Dictionary<int, Socket> bikeClients = new Dictionary<int, Socket>();
     public static void Main()
     {
         try
         {
-            Data data = new Data(10, 1.1, 2.2, 10, 3);
+            Data data = new Data(10, 1.1, 2.2, 10, 3,8);
             TcpListener myList = new TcpListener(IPAddress.Any, 8001);
             myList.Start();
             Console.WriteLine("The server is running at port 8001...");
@@ -77,92 +80,26 @@ public class server
     {
         i++;
         ASCIIEncoding asen = new ASCIIEncoding();
-        socket.Send(asen.GetBytes(i + ""));
+        bikeClients.Add(i, socket);
+        Console.WriteLine("Fiets-client verbonden met ID: " + i);
 
-        while (true)
-        {
-            try
-            {
-                byte[] buffer = new byte[1024];
-                int receivedBytes = socket.Receive(buffer);
-
-                if (receivedBytes == 0)
-                {
-                    Console.WriteLine("De client is gedisconnect.");
-                    break;
-                }
-
-                string jsonData = Encoding.ASCII.GetString(buffer, 0, receivedBytes).Trim();
-                Console.WriteLine("Ontvangen Data: " + jsonData);
-
-                Data dataObject = JsonConvert.DeserializeObject<Data>(jsonData);
-
-                if (dataObject != null)
-                {
-                    Console.WriteLine("Ontvangen dataobject:");
-                    Console.WriteLine(dataObject.ToString());
-                }
-                else
-                {
-                    Console.WriteLine("Error met deserializen.");
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error met ontvangen van data: " + e.Message);
-                break;
-            }
-        }
-        socket.Close();
-
-
+        BikeHandler bikeHandler = new BikeHandler(socket, i);
+        bikeHandler.HandleBike();
+        bikeClients.Remove(i);
 
     }
 
     public static void HandleDoctor(Socket socket)
     {
 
-        ASCIIEncoding asen = new ASCIIEncoding();
-        socket.Send(asen.GetBytes(i + ""));
+        //ASCIIEncoding asen = new ASCIIEncoding();
+        //socket.Send(asen.GetBytes(i + ""));
 
-        while (true)
-        {
-            try
-            {
-
-                byte[] b = new byte[100];
-                int k = socket.Receive(b);
-                Console.WriteLine("Recieved...");
-
-                String s = System.Text.Encoding.ASCII.GetString(b);
-                Console.WriteLine(s);
+        DoctorHandler DoctorHandler = new DoctorHandler(socket);
+        DoctorHandler.HandleDoctor();
 
 
-                if (s.StartsWith("WW"))
-                {
-                    socket.Send(asen.GetBytes("true"));
-
-
-                }
-
-    
-
-                else
-                {
-                    socket.Send(asen.GetBytes("Je bent geïntialiseerd als niks"));
-
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error met ontvangen van data: " + e.Message);
-                break;
-            }
-
-
-        }
         socket.Close();
-
 
     }
 }
@@ -173,16 +110,18 @@ public class Data
     private int id;
     private double speed;
     private double distance;
-    private double time;
+    private int time;
     private int heartBeat;
+    private int resistance;
 
-    public Data(int id, double speed, double distance, int time, int heartBeat)
+    public Data(int id, double speed, double distance, int time, int heartBeat, int resistance)
     {
         this.ID = id;
         this.Speed = speed;
         this.Distance = distance;
         this.Time = time;
         this.HeartBeat = heartBeat;
+        this.Resistance = resistance;
     }
 
     public int ID { get; set; }
@@ -190,6 +129,7 @@ public class Data
     public double Distance { get; set; }
     public int Time { get; set; }
     public int HeartBeat { get; set; }
+    public int Resistance { get; set; }
 
     public override string ToString()
     {
