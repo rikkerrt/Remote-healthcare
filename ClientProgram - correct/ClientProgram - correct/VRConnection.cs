@@ -45,10 +45,12 @@ namespace ClientProgram___correct {
             await readLength();
 
 
-            Console.WriteLine(dataString);
+            //Console.WriteLine(dataString);
             tunnelId = getTunnelId(dataString);
             Console.WriteLine(tunnelId);
            
+            sendTunnel(tunnelId);
+            await readLength();
         }
 
 
@@ -75,7 +77,7 @@ namespace ClientProgram___correct {
             } while (readTotal < dataBuffer.Length);
 
             dataString = Encoding.UTF8.GetString(dataBuffer,0,readTotal);
-            //Console.WriteLine(Encoding.UTF8.GetString(dataBuffer,0,readTotal));
+            Console.WriteLine(Encoding.UTF8.GetString(dataBuffer,0,readTotal));
 
             /*while (PrependLenght < lengthInt)
             {
@@ -97,7 +99,7 @@ namespace ClientProgram___correct {
             //int data = await networkStream.ReadAsync(payload, 0, payload.Length);
 
             //getID(dataString);
-            Console.WriteLine("vrconnection done");
+            //Console.WriteLine("vrconnection done");
         }
 
 
@@ -123,6 +125,14 @@ namespace ClientProgram___correct {
             
             SendPacket(prepend, data);
            
+        }
+        public static void sendTunnel(string tunnelid)
+        {
+            string jsonPacket = "{\"id\" : \"tunnel/send\", \"data\" : {\"dest\" : \"" + tunnelid + "\", \"data\" : {\"id\" : \"scene/reset\", \"data\" : \"{}\"}}}";
+            data = Encoding.ASCII.GetBytes(jsonPacket);
+            Console.WriteLine(jsonPacket);
+            prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
+            SendPacket(prepend, data);
         }
 
         
