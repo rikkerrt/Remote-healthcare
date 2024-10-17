@@ -26,10 +26,10 @@ namespace ClientProgram___correct
         public static double GetSpeed(string LSB, string MSB)
         {
             string TotalHexValue = MSB + LSB;
-            Console.WriteLine(TotalHexValue);
+            //Console.WriteLine(TotalHexValue);
 
             int DecValue = Convert.ToInt32(TotalHexValue, 16);
-            Console.WriteLine(DecValue);
+            //Console.WriteLine(DecValue);
             double SpeedInKmH = DecValue * 3.6;
             return SpeedInKmH;
         }

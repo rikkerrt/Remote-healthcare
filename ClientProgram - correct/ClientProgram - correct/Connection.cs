@@ -109,6 +109,12 @@ namespace ClientProgram___correct
                 }
             }
         }
+
+        public void sendResistance(int resistance)
+        {
+
+        }
+
         public static void sendResistance(BLE bleBike)
         {
 
