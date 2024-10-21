@@ -38,37 +38,25 @@ namespace ClientProgram___correct {
             prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
             SendPacket(prepend, data);
 
-            await readLength();
+            await ReadResponse();
             id = getID(dataString);
 
-            //Console.WriteLine(id);
-
             createTunnel(id);
-            await readLength();
+            await ReadResponse();
 
-
-            //Console.WriteLine(dataString);
             tunnelId = getTunnelId(dataString);
             Console.WriteLine(tunnelId);
 
-            sendTunnel("{\"id\" : \"scene/reset\", \"serial\" : \"123\", \"data\" : {} }");
-            await readLength();
+            clearScene();
 
             generateTerrain();
-            await readLength();
+            await ReadResponse();
 
             addNodeToTerrain();
-            await readLength();
-
-            //terrainHeight();
-            //await readLength();
-
-
-            //getTerrain();
-            //await readLength();
+            await ReadResponse();
         }
 
-        private static async Task readLength() {
+        private static async Task ReadResponse() {
             byte[] length = new byte[4];
             int PrependLenght = 0;
 
@@ -80,7 +68,7 @@ namespace ClientProgram___correct {
             int lengthInt = BitConverter.ToInt32(length, 0);
             Console.WriteLine(lengthInt);
             byte[] dataBuffer = new byte[lengthInt];
-
+            
             int readTotal = 0;
             do {
                 int read = await networkStream.ReadAsync(dataBuffer, readTotal, dataBuffer.Length - readTotal);
@@ -114,7 +102,6 @@ namespace ClientProgram___correct {
             //Console.WriteLine("vrconnection done");
         }
 
-
         public static void SendPacket(byte[] prepend, byte[] data) {
             byte[] combinedArray = new byte[prepend.Length + data.Length];
             Array.Copy(prepend, 0, combinedArray, 0, prepend.Length);
@@ -130,24 +117,31 @@ namespace ClientProgram___correct {
         }
 
         public static void createTunnel(string id) {
-            string jsonPacket = "{\"id\" : \"tunnel/create\", \"data\" : {\"session\" : \"" + id + "\", \"key\" : \"\"}}";
-            Console.WriteLine(jsonPacket);
-            data = Encoding.ASCII.GetBytes(jsonPacket);
-            prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
-
+            var tunnelCommand = new {
+                id = "tunnel/create",
+                data = new {
+                    session = id,
+                    key = ""
+                }
+            };
+            
+            string jsonPacket = JsonConvert.SerializeObject(tunnelCommand);
+            Console.Write(tunnelCommand);
+            byte[] data = Encoding.ASCII.GetBytes(jsonPacket);
+            byte[] prepend = BitConverter.GetBytes(data.Length);
             SendPacket(prepend, data);
+        }
 
+        public static void clearScene() {
+            var clearData = new {
+                
+            };
+
+            SendTunnelCommand("scene/reset", clearData);
         }
-        public static void sendTunnel(string command) {
-            string jsonPacket = "{\"id\" : \"tunnel/send\", \"data\" : {\"dest\" : \"" + tunnelId + "\", \"data\" : " + command + "}}";
-            data = Encoding.ASCII.GetBytes(jsonPacket);
-            Console.WriteLine(jsonPacket);
-            prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
-            SendPacket(prepend, data);
-        }
+
         public static void SendTunnelCommand(string command, object jsonCommandData)
         {
-
             var alJsonData = new
             {
                 id = "tunnel/send",
@@ -161,6 +155,7 @@ namespace ClientProgram___correct {
                     }
                 }
             };
+
             string jsonPacket = JsonConvert.SerializeObject(alJsonData);
 
             byte[] data = Encoding.ASCII.GetBytes(jsonPacket);
@@ -177,10 +172,9 @@ namespace ClientProgram___correct {
             {
                 for (int y = 0; y < height; y++)
                 {
-                    heights[x, y] = 2 + (float)(Math.Sin(x / 10.0) + Math.Cos(y / 10.0)) * 2 + (float)(new Random().NextDouble() * 2 - 1);
+                    heights[x, y] = 0;
                 }
             }
-
 
             var terrainData = new
             {
@@ -189,50 +183,35 @@ namespace ClientProgram___correct {
             };
             SendTunnelCommand("scene/terrain/add", terrainData);
         }
+
         private static void addNodeToTerrain()
         {
-            string name = "hoi";
-            var nodeData = new
-            {
+       
+
+            string name = "terrain";
+            var nodeData = new {
                 name = name,
-                components = new
-                {
-                    terrain = new
-                    {
+                components = new {
+                    transform = new {
+                        position = new[] { -128, 1, -128 },
+                        scale = 1,
+                        rotation = new[] { 0, 0, 0 },
+                    },
+                    terrain = new {
                         smooth = true,
+                    },
+                    panel = new {
+                        size = new[] { 64, 64 },
+                        resolution = new[] { 512, 512 },
+                        background = new[] { 0, 0, 0, 1 },
+                        castShadow = true,
                     }
                 }
             };
 
             SendTunnelCommand("scene/node/add", nodeData);
         }
-
-        /*private static void getTerrain() {
-            string jsonPacket = "{\"id\" : \"scene/load\", \"data\" : {\"filename\" : \"cookie.json\"}}";
-            sendTunnel(jsonPacket);
-        }
-
-        private static void saveFile() {
-            string jsonPacket = "{\"id\" : \"scene/save\", \"data\" : {\"filename\" : \"cookie.json\", \"overwrite\" : \"false\"} }";
-            sendTunnel(jsonPacket);
-        }
-        private static void terrainHeight()
-        {
-            string jsonPacket = "{\"id\" : \"scene/terrain/getheight\", \"data\" : {\"position\" : [10.2,4.4], \"positions\" : [[10.2,4.4],[11.2,4.4],[12.2,4.4]]}}";
-            sendTunnel(jsonPacket);
-        }*/
         
-
-
-
-
-        //Outdated
-        /*public static string recieveData() {
-            byte[] buffer = new byte[1500];
-            Console.WriteLine(networkStream.Read(buffer, 0, buffer.Length));
-            Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length)));
-            return Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length));
-        }*/
         public static string getTunnelId(string tunnelDataString) {
             string tunnelId = "";
             JsonTunnelData tunnelDataObj = JsonConvert.DeserializeObject<JsonTunnelData>(tunnelDataString);
@@ -243,6 +222,7 @@ namespace ClientProgram___correct {
 
             return tunnelId;
         }
+
         public static string getID(string data) {
             string idHost = "";
 
@@ -253,16 +233,16 @@ namespace ClientProgram___correct {
                 if (data1.features.Contains("tunnel")) {
                     ClientInfo info = data1.clientinfo;
                     if (info.host.ToLower() == System.Net.Dns.GetHostName().ToLower()) {
-                        //Console.WriteLine(data1.id);
+                        Console.WriteLine(data1.id);
                         idHost = data1.id;
                     }
-                    else {
-                        //Console.WriteLine("Niet de juiste host");
-                    }
+
                 }
 
             }
+
             return idHost;
+
             //var jsonDocument = JObject.Parse(data);
             //Console.WriteLine(jsonDocument.ToString());
 
@@ -289,6 +269,39 @@ namespace ClientProgram___correct {
             }*/
 
         }
+        
+        //public static void sendTunnel(string command) {
+        //    string jsonPacket = "{\"id\" : \"tunnel/send\", \"data\" : {\"dest\" : \"" + tunnelId + "\", \"data\" : " + command + "}}";
+        //    data = Encoding.ASCII.GetBytes(jsonPacket);
+        //    Console.WriteLine(jsonPacket);
+        //    prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
+        //    SendPacket(prepend, data);
+        //}
+        
+        //Outdated
+        /*public static string recieveData() {
+            byte[] buffer = new byte[1500];
+            Console.WriteLine(networkStream.Read(buffer, 0, buffer.Length));
+            Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length)));
+            return Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length));
+        }*/
+
+        /*private static void getTerrain() {
+            string jsonPacket = "{\"id\" : \"scene/load\", \"data\" : {\"filename\" : \"cookie.json\"}}";
+            sendTunnel(jsonPacket);
+        }
+            
+        private static void saveFile() {
+            string jsonPacket = "{\"id\" : \"scene/save\", \"data\" : {\"filename\" : \"cookie.json\", \"overwrite\" : \"false\"} }";
+            sendTunnel(jsonPacket);
+        }
+        private static void terrainHeight()
+        {
+            string jsonPacket = "{\"id\" : \"scene/terrain/getheight\", \"data\" : {\"position\" : [10.2,4.4], \"positions\" : [[10.2,4.4],[11.2,4.4],[12.2,4.4]]}}";
+            sendTunnel(jsonPacket);
+        }*/
+
+
     }
     internal class JsonTunnelData {
         public string id { get; set; }
