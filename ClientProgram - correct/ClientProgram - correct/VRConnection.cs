@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Security.Policy;
 using System.Security.Principal;
@@ -48,36 +49,39 @@ namespace ClientProgram___correct {
             //Console.WriteLine(dataString);
             tunnelId = getTunnelId(dataString);
             Console.WriteLine(tunnelId);
-           
-            sendTunnel(tunnelId);
+
+            sendTunnel("{\"id\" : \"scene/reset\", \"serial\" : \"123\", \"data\" : {} }");
+            await readLength();
+
+            saveFile();
+            await readLength();
+
+            getTerrain();
             await readLength();
         }
-
-
 
         private static async Task readLength() {
             byte[] length = new byte[4];
             int PrependLenght = 0;
-            
-            while (PrependLenght < 4) { 
+
+            while (PrependLenght < 4) {
                 int dataPrependRead = await networkStream.ReadAsync(length, 0, length.Length);
                 PrependLenght += dataPrependRead;
             }
-          
-            int lengthInt = BitConverter.ToInt32(length,0);
+
+            int lengthInt = BitConverter.ToInt32(length, 0);
             Console.WriteLine(lengthInt);
-            byte[] dataBuffer =  new byte[lengthInt];
+            byte[] dataBuffer = new byte[lengthInt];
 
             int readTotal = 0;
-            do
-            {
+            do {
                 int read = await networkStream.ReadAsync(dataBuffer, readTotal, dataBuffer.Length - readTotal);
                 readTotal += read;
                 //Console.WriteLine(readTotal);
             } while (readTotal < dataBuffer.Length);
 
-            dataString = Encoding.UTF8.GetString(dataBuffer,0,readTotal);
-            Console.WriteLine(Encoding.UTF8.GetString(dataBuffer,0,readTotal));
+            dataString = Encoding.UTF8.GetString(dataBuffer, 0, readTotal);
+            Console.WriteLine(Encoding.UTF8.GetString(dataBuffer, 0, readTotal));
 
             /*while (PrependLenght < lengthInt)
             {
@@ -86,7 +90,7 @@ namespace ClientProgram___correct {
                 Console.WriteLine(PrependLenght);
                 PrependLenght += bytesread;
             }*/
-            
+
             //collins trying
             //while ((readTotal = await networkStream.ReadAsync(dataBuffer, 0, dataBuffer.Length)) != 0) {
             //    dataString = Encoding.UTF8.GetString(dataBuffer, 0, dataBuffer.Length);
@@ -113,29 +117,47 @@ namespace ClientProgram___correct {
         public static void createData() {
             string jsonPacket = "{\"id\" : \"session/list\"}";
             data = Encoding.ASCII.GetBytes(jsonPacket);
-            prepend = new byte[] {(byte)jsonPacket.Length, 0x00, 0x00, 0x00};
+            prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
             SendPacket(prepend, data);
         }
-        public static void createTunnel(string id)
-        {
+
+        public static void createTunnel(string id) {
             string jsonPacket = "{\"id\" : \"tunnel/create\", \"data\" : {\"session\" : \"" + id + "\", \"key\" : \"\"}}";
             Console.WriteLine(jsonPacket);
             data = Encoding.ASCII.GetBytes(jsonPacket);
             prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
-            
+
             SendPacket(prepend, data);
-           
+
         }
-        public static void sendTunnel(string tunnelid)
-        {
-            string jsonPacket = "{\"id\" : \"tunnel/send\", \"data\" : {\"dest\" : \"" + tunnelid + "\", \"data\" : {\"id\" : \"scene/reset\", \"serial\" : \"123\", \"data\" : {} }}}";
+        public static void sendTunnel(string command) {
+            string jsonPacket = "{\"id\" : \"tunnel/send\", \"data\" : {\"dest\" : \"" + tunnelId + "\", \"data\" : " + command + "}}";
             data = Encoding.ASCII.GetBytes(jsonPacket);
             Console.WriteLine(jsonPacket);
             prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
             SendPacket(prepend, data);
         }
 
-        
+        private static void generateTerrain() {
+            string jsonPacket = "{\"id\" : \"scene/terrain/add\", \"data\" : {\"size\" : [ 256, 256 ], \"heights\" : [ 0, 0, 0, ...... 0, 0, 0 ]}}";
+            string jsonPAcket = "{\"id\" : \"scene/load\", \"data\" : {\"filename\" : \"cookie.json}}";
+
+            SendPacket(prepend, data);
+        }
+
+        private static void getTerrain() {
+            string jsonPacket = "{\"id\" : \"scene/load\", \"data\" : {\"filename\" : \"cookie.json\"}}";
+            sendTunnel(jsonPacket);
+        }
+
+        private static void saveFile() {
+            string jsonPacket = "{\"id\" : \"scene/save\", \"data\" : {\"filename\" : \"cookie.json\", \"overwrite\" : \"false\"} }";
+            sendTunnel(jsonPacket);
+        }
+
+
+
+
         //Outdated
         /*public static string recieveData() {
             byte[] buffer = new byte[1500];
@@ -143,38 +165,34 @@ namespace ClientProgram___correct {
             Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length)));
             return Encoding.ASCII.GetString(buffer, 0, networkStream.Read(buffer, 0, buffer.Length));
         }*/
-        public static string getTunnelId(string tunnelDataString)
-        {
+        public static string getTunnelId(string tunnelDataString) {
             string tunnelId = "";
             JsonTunnelData tunnelDataObj = JsonConvert.DeserializeObject<JsonTunnelData>(tunnelDataString);
 
             TunnelData tunnelData = tunnelDataObj.data;
             tunnelId = tunnelData.id;
-            
+
 
             return tunnelId;
         }
         public static string getID(string data) {
             string idHost = "";
-       
+
             JsonData dataList = JsonConvert.DeserializeObject<JsonData>(data);
             List<Data> dataObject = dataList.data;
 
-            foreach (Data data1 in dataObject)
-            {
+            foreach (Data data1 in dataObject) {
                 if (data1.features.Contains("tunnel")) {
                     ClientInfo info = data1.clientinfo;
-                    if (info.host.ToLower() == System.Net.Dns.GetHostName().ToLower())
-                    {
+                    if (info.host.ToLower() == System.Net.Dns.GetHostName().ToLower()) {
                         //Console.WriteLine(data1.id);
                         idHost = data1.id;
                     }
-                    else
-                    {
+                    else {
                         //Console.WriteLine("Niet de juiste host");
                     }
                 }
-                
+
             }
             return idHost;
             //var jsonDocument = JObject.Parse(data);
@@ -204,12 +222,10 @@ namespace ClientProgram___correct {
 
         }
     }
-    internal class JsonTunnelData
-    {
+    internal class JsonTunnelData {
         public string id { get; set; }
         public TunnelData data { get; set; }
-        public JsonTunnelData(string id, TunnelData data)
-        {
+        public JsonTunnelData(string id, TunnelData data) {
             this.data = data;
             this.id = id;
         }
@@ -223,12 +239,10 @@ namespace ClientProgram___correct {
             this.id = id;
         }
     }
-    internal class TunnelData
-    {
+    internal class TunnelData {
         public string status { get; set; }
         public string id { get; set; }
-        public TunnelData(string status, string id)
-        {
+        public TunnelData(string status, string id) {
             this.status = status;
             this.id = id;
         }
@@ -237,11 +251,11 @@ namespace ClientProgram___correct {
 
     internal class Data {
         public string id { get; set; }
-        public  string beginTime { get; set; }
-        public  string lastPing { get; set; }
-        public  List<Fps> fps { get; set; }
-        public  List<string> features { get; set; }
-        public  ClientInfo clientinfo{ get; set; }
+        public string beginTime { get; set; }
+        public string lastPing { get; set; }
+        public List<Fps> fps { get; set; }
+        public List<string> features { get; set; }
+        public ClientInfo clientinfo { get; set; }
 
         public Data(string id, string beginTime, string lastPing, List<Fps> fps, List<string> features, ClientInfo client) {
             this.id = id;
@@ -274,6 +288,6 @@ namespace ClientProgram___correct {
         public Fps(long time, double fps) {
             this.fps = fps;
             this.time = time;
-        }    
+        }
     }
 }
