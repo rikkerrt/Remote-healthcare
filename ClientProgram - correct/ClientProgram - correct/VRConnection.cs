@@ -128,7 +128,7 @@ namespace ClientProgram___correct {
         }
         public static void sendTunnel(string tunnelid)
         {
-            string jsonPacket = "{\"id\" : \"tunnel/send\", \"data\" : {\"dest\" : \"" + tunnelid + "\", \"data\" : {\"id\" : \"scene/reset\", \"data\" : \"{}\"}}}";
+            string jsonPacket = "{\"id\" : \"tunnel/send\", \"data\" : {\"dest\" : \"" + tunnelid + "\", \"data\" : {\"id\" : \"scene/reset\", \"serial\" : \"123\", \"data\" : {} }}}";
             data = Encoding.ASCII.GetBytes(jsonPacket);
             Console.WriteLine(jsonPacket);
             prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
