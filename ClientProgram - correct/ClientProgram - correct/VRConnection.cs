@@ -33,12 +33,9 @@ namespace ClientProgram___correct {
             client.Connect(_address, 6666);
             networkStream = client.GetStream();
 
-            string jsonPacket = "{\"id\" : \"session/list\"}";
-            data = Encoding.ASCII.GetBytes(jsonPacket);
-            prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
-            SendPacket(prepend, data);
-
+            createData();
             await ReadResponse();
+
             id = getID(dataString);
 
             createTunnel(id);
@@ -48,12 +45,16 @@ namespace ClientProgram___correct {
             Console.WriteLine(tunnelId);
 
             clearScene();
+            await ReadResponse();
 
             generateTerrain();
             await ReadResponse();
 
             addNodeToTerrain();
             await ReadResponse();
+
+            //addLayerToNode();
+            //await ReadResponse();
         }
 
         private static async Task ReadResponse() {
@@ -66,7 +67,7 @@ namespace ClientProgram___correct {
             }
 
             int lengthInt = BitConverter.ToInt32(length, 0);
-            Console.WriteLine(lengthInt);
+            //Console.WriteLine(lengthInt);
             byte[] dataBuffer = new byte[lengthInt];
             
             int readTotal = 0;
@@ -77,7 +78,7 @@ namespace ClientProgram___correct {
             } while (readTotal < dataBuffer.Length);
 
             dataString = Encoding.UTF8.GetString(dataBuffer, 0, readTotal);
-            Console.WriteLine(Encoding.UTF8.GetString(dataBuffer, 0, readTotal));
+            Console.WriteLine("Response: " + Encoding.UTF8.GetString(dataBuffer, 0, readTotal));
 
             /*while (PrependLenght < lengthInt)
             {
@@ -107,6 +108,7 @@ namespace ClientProgram___correct {
             Array.Copy(prepend, 0, combinedArray, 0, prepend.Length);
             Array.Copy(data, 0, combinedArray, prepend.Length, data.Length);
             networkStream.Write(combinedArray, 0, combinedArray.Length);
+            Console.WriteLine("Command send: " + Encoding.UTF8.GetString(combinedArray));
         }
 
         public static void createData() {
@@ -126,7 +128,6 @@ namespace ClientProgram___correct {
             };
             
             string jsonPacket = JsonConvert.SerializeObject(tunnelCommand);
-            Console.Write(tunnelCommand);
             byte[] data = Encoding.ASCII.GetBytes(jsonPacket);
             byte[] prepend = BitConverter.GetBytes(data.Length);
             SendPacket(prepend, data);
@@ -186,11 +187,9 @@ namespace ClientProgram___correct {
 
         private static void addNodeToTerrain()
         {
-       
 
-            string name = "terrain";
             var nodeData = new {
-                name = name,
+                name = "terrain",
                 components = new {
                     transform = new {
                         position = new[] { -128, 1, -128 },
@@ -211,6 +210,20 @@ namespace ClientProgram___correct {
 
             SendTunnelCommand("scene/node/add", nodeData);
         }
+        /*public static void addLayerToNode()
+        {
+            var layerData = new
+            {
+                id = new { uuid },
+                diffuse = new {texture.avif},
+                normal =  new {texture.avif},
+                minHeight = 1,
+                maxHeight = 10,
+                fadeDist = 1
+            };
+            SendTunnelCommand("scene/node/addlayer", layerData);
+
+        }*/
         
         public static string getTunnelId(string tunnelDataString) {
             string tunnelId = "";
