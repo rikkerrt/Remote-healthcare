@@ -57,6 +57,9 @@ namespace ClientProgram___correct {
             generateTerrain();
             await readLength();
 
+            addNodeToTerrain();
+            await readLength();
+
             //terrainHeight();
             //await readLength();
 
@@ -188,11 +191,23 @@ namespace ClientProgram___correct {
         }
         private static void addNodeToTerrain()
         {
+            string name = "hoi";
+            var nodeData = new
+            {
+                name = name,
+                components = new
+                {
+                    terrain = new
+                    {
+                        smooth = true,
+                    }
+                }
+            };
 
-
+            SendTunnelCommand("scene/node/add", nodeData);
         }
 
-        private static void getTerrain() {
+        /*private static void getTerrain() {
             string jsonPacket = "{\"id\" : \"scene/load\", \"data\" : {\"filename\" : \"cookie.json\"}}";
             sendTunnel(jsonPacket);
         }
@@ -205,7 +220,7 @@ namespace ClientProgram___correct {
         {
             string jsonPacket = "{\"id\" : \"scene/terrain/getheight\", \"data\" : {\"position\" : [10.2,4.4], \"positions\" : [[10.2,4.4],[11.2,4.4],[12.2,4.4]]}}";
             sendTunnel(jsonPacket);
-        }
+        }*/
         
 
 
