@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Policy;
@@ -53,11 +54,15 @@ namespace ClientProgram___correct {
             sendTunnel("{\"id\" : \"scene/reset\", \"serial\" : \"123\", \"data\" : {} }");
             await readLength();
 
-            saveFile();
+            generateTerrain();
             await readLength();
 
-            getTerrain();
-            await readLength();
+            //terrainHeight();
+            //await readLength();
+
+
+            //getTerrain();
+            //await readLength();
         }
 
         private static async Task readLength() {
@@ -137,12 +142,54 @@ namespace ClientProgram___correct {
             prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
             SendPacket(prepend, data);
         }
+        public static void SendTunnelCommand(string command, object jsonCommandData)
+        {
+
+            var alJsonData = new
+            {
+                id = "tunnel/send",
+                data = new
+                {
+                    dest = tunnelId,
+                    data = new
+                    {
+                        id = command,
+                        data = jsonCommandData
+                    }
+                }
+            };
+            string jsonPacket = JsonConvert.SerializeObject(alJsonData);
+
+            byte[] data = Encoding.ASCII.GetBytes(jsonPacket);
+            byte[] prepend = BitConverter.GetBytes(data.Length);
+            SendPacket(prepend, data);
+        }
 
         private static void generateTerrain() {
-            string jsonPacket = "{\"id\" : \"scene/terrain/add\", \"data\" : {\"size\" : [ 256, 256 ], \"heights\" : [ 0, 0, 0, ...... 0, 0, 0 ]}}";
-            string jsonPAcket = "{\"id\" : \"scene/load\", \"data\" : {\"filename\" : \"cookie.json}}";
+            int width = 256;
+            int height = 256;
+            float[,] heights = new float[width, height];
 
-            SendPacket(prepend, data);
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    heights[x, y] = 2 + (float)(Math.Sin(x / 10.0) + Math.Cos(y / 10.0)) * 2 + (float)(new Random().NextDouble() * 2 - 1);
+                }
+            }
+
+
+            var terrainData = new
+            {
+                size = new[] { width, height },
+                heights = heights.Cast<float>().ToArray()
+            };
+            SendTunnelCommand("scene/terrain/add", terrainData);
+        }
+        private static void addNodeToTerrain()
+        {
+
+
         }
 
         private static void getTerrain() {
@@ -154,6 +201,12 @@ namespace ClientProgram___correct {
             string jsonPacket = "{\"id\" : \"scene/save\", \"data\" : {\"filename\" : \"cookie.json\", \"overwrite\" : \"false\"} }";
             sendTunnel(jsonPacket);
         }
+        private static void terrainHeight()
+        {
+            string jsonPacket = "{\"id\" : \"scene/terrain/getheight\", \"data\" : {\"position\" : [10.2,4.4], \"positions\" : [[10.2,4.4],[11.2,4.4],[12.2,4.4]]}}";
+            sendTunnel(jsonPacket);
+        }
+        
 
 
 
