@@ -21,9 +21,12 @@ namespace ClientProgram___correct {
         private static string encoded = "";
         private static string send;
         private static string dataString;
+
         private static string id;
         private static string tunnelId;
         private static string uuIDstring;
+        private static string routeID;
+
         private int _port;
 
         private static NetworkStream networkStream;
@@ -54,16 +57,28 @@ namespace ClientProgram___correct {
             addNodeToTerrain();
             await ReadResponse();
 
-            //uuIDstring = getUUIDstring(dataString);
-            //Console.WriteLine("De string van de textures " + uuIDstring);
-            //addLayerToNode(uuIDstring);
-            //await ReadResponse();
+            uuIDstring = getUUIDstring(dataString);
+            Console.WriteLine("De string van de textures " + uuIDstring);
+            addLayerToNode(uuIDstring);
+            await ReadResponse();
 
             addRouteToMap();
             await ReadResponse();
 
+            routeID = getRouteID(dataString);
+            Console.WriteLine("Route ID " + routeID);
+
+
             showRouteOnMap();
             await ReadResponse();
+
+            addBikeNodeToMap();
+            await ReadResponse();
+
+            followRouteWithNode();
+            await ReadResponse();
+
+
         }
 
         private static async Task ReadResponse() {
@@ -117,7 +132,7 @@ namespace ClientProgram___correct {
             Array.Copy(prepend, 0, combinedArray, 0, prepend.Length);
             Array.Copy(data, 0, combinedArray, prepend.Length, data.Length);
             networkStream.Write(combinedArray, 0, combinedArray.Length);
-            //Console.WriteLine("Command send: " + Encoding.UTF8.GetString(combinedArray));
+            Console.WriteLine("Command send: " + Encoding.UTF8.GetString(combinedArray));
         }
 
         public static void createData() {
@@ -219,15 +234,53 @@ namespace ClientProgram___correct {
 
             SendTunnelCommand("scene/node/add", nodeData);
         }
-        public static void addLayerToNode(string uuid)
+        private static void addBikeNodeToMap()
         {
-            string fileName = "grass.jpg";
-            Console.WriteLine(uuid);
+            var nodeData = new
+            {
+                name = "entity",
+                components = new
+                {
+                    transform = new
+                    {
+                        position = new[] { 0, 0, 0 },
+                        scale = 1,
+                        rotation = new[] { 0, 0, 0 },
+                    },
+                    panel = new
+                    {
+                        size = new[] { 4, 4 },
+                        resolution = new[] { 512, 512, },
+                        background = new[] { 0, 0, 0, 1 },
+                        castShadow = true,
+                    }
+                } 
+            };
+
+            SendTunnelCommand("scene/node/add",nodeData);
+        }
+        private static void followRouteWithNode()
+        {
+            var followData = new
+            {
+                route = routeID,
+                node = "entity",
+                speed = 1.0,
+                rotate = "NONE",
+                smoothing = 1.0,
+                followHeight = false,
+                rotateOffset = new byte[] { 0, 0,0 },
+                positionOffset = new byte[] { 0,0,0 },
+            };
+            SendTunnelCommand("route/follow", followData);
+        }
+        private static void addLayerToNode(string uuid)
+        {
             var layerData = new
             {
-                id = new {fileName},
-                diffuse = new {fileName},
-                normal =  new {fileName},
+                id = uuid,
+                diffuse = "grass.jpg",
+                normal =  "grass.jpg",
                 minHeight = 1,
                 maxHeight = 10,
                 fadeDist = 1
@@ -235,7 +288,7 @@ namespace ClientProgram___correct {
             SendTunnelCommand("scene/node/addlayer", layerData);
                 
         }
-        public static void addRouteToMap()
+        private static void addRouteToMap()
         {
             var routeData = new
             {
@@ -248,7 +301,7 @@ namespace ClientProgram___correct {
             };
             SendTunnelCommand("route/add",routeData);
         }
-        public static void showRouteOnMap()
+        private static void showRouteOnMap()
         {
             var showRouteData = new
             {
@@ -279,6 +332,19 @@ namespace ClientProgram___correct {
             uuid = textureTools.uuid;
 
             return uuid;
+        }
+        public static string getRouteID(string routeDataString)
+        {
+            string routeID = "";
+            JsonRouteData jsonRouteData = JsonConvert.DeserializeObject<JsonRouteData>(routeDataString);
+
+            RouteScope routeScope = jsonRouteData.data;
+            RouteData routeData = routeScope.data;
+            RouteTools routeTools = routeData.data;
+
+            routeID = routeTools.uuid;
+
+            return routeID;
         }
 
         public static string getID(string data) {
@@ -469,6 +535,42 @@ namespace ClientProgram___correct {
         public TextureTools(string name, string uuid)
         {
             this.name = name;
+            this.uuid = uuid;
+        }
+    }
+    internal class JsonRouteData
+    {
+        public string id { get; set; }
+        public RouteScope data { get; set; }
+        public JsonRouteData(string id, RouteScope data)
+        {
+            this.id = id;
+            this.data = data;
+        }   
+    }
+    internal class RouteScope
+    {
+        public string id { get; set; }
+        public RouteData data { get; set; }
+        public RouteScope(string id, RouteData data)
+        {
+            this.id = id;
+            this.data = data;
+        }
+    }
+    internal class RouteData
+    {
+        public RouteTools data { get; set; }
+        public RouteData(RouteTools data)
+        {
+            this.data = data;
+        }
+    }
+    internal class RouteTools
+    {
+        public string uuid { get; set; }
+        public RouteTools(string uuid)
+        {
             this.uuid = uuid;
         }
     }
