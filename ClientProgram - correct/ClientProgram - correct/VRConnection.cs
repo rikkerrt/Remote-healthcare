@@ -26,6 +26,7 @@ namespace ClientProgram___correct {
         private static string tunnelId;
         private static string uuIDstring;
         private static string routeID;
+        private static string bikeIDstring;
 
         private int _port;
 
@@ -74,6 +75,8 @@ namespace ClientProgram___correct {
 
             addBikeNodeToMap();
             await ReadResponse();
+            bikeIDstring = getUUIDstring(dataString);
+
 
             followRouteWithNode();
             await ReadResponse();
@@ -132,7 +135,7 @@ namespace ClientProgram___correct {
             Array.Copy(prepend, 0, combinedArray, 0, prepend.Length);
             Array.Copy(data, 0, combinedArray, prepend.Length, data.Length);
             networkStream.Write(combinedArray, 0, combinedArray.Length);
-            Console.WriteLine("Command send: " + Encoding.UTF8.GetString(combinedArray));
+            //Console.WriteLine("Command send: " + Encoding.UTF8.GetString(combinedArray));
         }
 
         public static void createData() {
@@ -264,13 +267,14 @@ namespace ClientProgram___correct {
             var followData = new
             {
                 route = routeID,
-                node = "entity",
-                speed = 1.0,
-                rotate = "NONE",
+                node = bikeIDstring,
+                speed = 10.0,
+                offset = 0.0,
+                rotate = "XYZ",
                 smoothing = 1.0,
                 followHeight = false,
-                rotateOffset = new byte[] { 0, 0,0 },
-                positionOffset = new byte[] { 0,0,0 },
+                rotateOffset = new[] { 0, 0,0 },
+                positionOffset = new[] { 0,0,0 }
             };
             SendTunnelCommand("route/follow", followData);
         }
