@@ -23,6 +23,7 @@ namespace ClientProgram___correct {
         private static string dataString;
         private static string id;
         private static string tunnelId;
+        private static string uuIDstring;
         private int _port;
 
         private static NetworkStream networkStream;
@@ -53,8 +54,16 @@ namespace ClientProgram___correct {
             addNodeToTerrain();
             await ReadResponse();
 
-            //addLayerToNode();
+            //uuIDstring = getUUIDstring(dataString);
+            //Console.WriteLine("De string van de textures " + uuIDstring);
+            //addLayerToNode(uuIDstring);
             //await ReadResponse();
+
+            addRouteToMap();
+            await ReadResponse();
+
+            showRouteOnMap();
+            await ReadResponse();
         }
 
         private static async Task ReadResponse() {
@@ -108,7 +117,7 @@ namespace ClientProgram___correct {
             Array.Copy(prepend, 0, combinedArray, 0, prepend.Length);
             Array.Copy(data, 0, combinedArray, prepend.Length, data.Length);
             networkStream.Write(combinedArray, 0, combinedArray.Length);
-            Console.WriteLine("Command send: " + Encoding.UTF8.GetString(combinedArray));
+            //Console.WriteLine("Command send: " + Encoding.UTF8.GetString(combinedArray));
         }
 
         public static void createData() {
@@ -210,20 +219,43 @@ namespace ClientProgram___correct {
 
             SendTunnelCommand("scene/node/add", nodeData);
         }
-        /*public static void addLayerToNode()
+        public static void addLayerToNode(string uuid)
         {
+            string fileName = "grass.jpg";
+            Console.WriteLine(uuid);
             var layerData = new
             {
-                id = new { uuid },
-                diffuse = new {texture.avif},
-                normal =  new {texture.avif},
+                id = new {fileName},
+                diffuse = new {fileName},
+                normal =  new {fileName},
                 minHeight = 1,
                 maxHeight = 10,
                 fadeDist = 1
             };
             SendTunnelCommand("scene/node/addlayer", layerData);
-
-        }*/
+                
+        }
+        public static void addRouteToMap()
+        {
+            var routeData = new
+            {
+                nodes = new[] { 
+                    new { pos = new[] {0,0,0},dir = new[] { 5,0,-5}  },
+                    new { pos = new[] {50,0,0 },dir = new[] {5,0,5} },
+                    new { pos = new[] {50,0,50},dir = new[] {-5,0,5} },
+                    new { pos = new[] {0,0,50 }, dir = new [] {-5,0,-5} }
+                }
+            };
+            SendTunnelCommand("route/add",routeData);
+        }
+        public static void showRouteOnMap()
+        {
+            var showRouteData = new
+            {
+                show = true,
+            };
+            SendTunnelCommand("route/show",showRouteData);
+        }
         
         public static string getTunnelId(string tunnelDataString) {
             string tunnelId = "";
@@ -234,6 +266,19 @@ namespace ClientProgram___correct {
 
 
             return tunnelId;
+        }
+        public static string getUUIDstring(string uuiddataString)
+        {
+            string uuid = "";
+            JsonTextureData jsonTextureData = JsonConvert.DeserializeObject<JsonTextureData>(uuiddataString);
+
+            TextureScope textureScope = jsonTextureData.data;
+            TextureData textureData = textureScope.data;
+            TextureTools textureTools = textureData.data;
+
+            uuid = textureTools.uuid;
+
+            return uuid;
         }
 
         public static string getID(string data) {
@@ -316,6 +361,8 @@ namespace ClientProgram___correct {
 
 
     }
+    
+
     internal class JsonTunnelData {
         public string id { get; set; }
         public TunnelData data { get; set; }
@@ -336,7 +383,9 @@ namespace ClientProgram___correct {
     internal class TunnelData {
         public string status { get; set; }
         public string id { get; set; }
-        public TunnelData(string status, string id) {
+       
+        public TunnelData(string status, string id)
+        {
             this.status = status;
             this.id = id;
         }
@@ -382,6 +431,45 @@ namespace ClientProgram___correct {
         public Fps(long time, double fps) {
             this.fps = fps;
             this.time = time;
+        }
+    }
+
+    internal class JsonTextureData
+    {
+        public string id { get; set; }
+        public TextureScope data { get; set; }
+        public JsonTextureData(string id, TextureScope data)
+        {
+            this.id = id;
+            this.data = data;
+        }
+    }
+    internal class TextureScope 
+    {
+        public string id { get; set;}
+        public TextureData data {  get; set; } 
+        public TextureScope(string id, TextureData data)
+        {
+            this.id = id;
+            this.data = data;
+        }
+    }
+    internal class TextureData
+    {
+        public TextureTools data { get; set; }
+        public TextureData(TextureTools data)
+        {
+            this.data = data;
+        }
+    }
+    internal class TextureTools
+    {
+        public string name { get; set; }
+        public string uuid { get; set; }
+        public TextureTools(string name, string uuid)
+        {
+            this.name = name;
+            this.uuid = uuid;
         }
     }
 }
