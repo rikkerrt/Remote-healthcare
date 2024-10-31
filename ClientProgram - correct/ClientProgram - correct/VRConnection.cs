@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -27,6 +28,7 @@ namespace ClientProgram___correct {
         private static string uuIDstring;
         private static string routeID;
         private static string bikeIDstring;
+        private static string cameraIDstring;
 
         private int _port;
 
@@ -54,6 +56,7 @@ namespace ClientProgram___correct {
 
             generateTerrain();
             await ReadResponse();
+            Console.WriteLine(dataString);
 
             addNodeToTerrain();
             await ReadResponse();
@@ -76,13 +79,18 @@ namespace ClientProgram___correct {
             addRoadTexture(routeID);
             await ReadResponse();
 
-            addBikeNodeToMap();
-            await ReadResponse();
-            bikeIDstring = getUUIDstring(dataString);
+            //addBikeNodeToMap();
+            //await ReadResponse();
+            //bikeIDstring = getUUIDstring(dataString);
 
+            findCameraNode();
+            await ReadResponse();
+
+            cameraIDstring = getCameraID(dataString);
+            Console.WriteLine("Camera ID " + cameraIDstring);
+            
             followRouteWithNode();
             await ReadResponse();
-
 
         }
 
@@ -169,6 +177,14 @@ namespace ClientProgram___correct {
 
             SendTunnelCommand("scene/reset", clearData);
         }
+        private static void findCameraNode()
+        {
+            var cameraNodeCommand = new
+            {
+                name = "Camera"
+            };
+            SendTunnelCommand("scene/node/find", cameraNodeCommand);
+        }
 
         public static void SendTunnelCommand(string command, object jsonCommandData)
         {
@@ -233,7 +249,7 @@ namespace ClientProgram___correct {
 
             SendTunnelCommand("scene/node/add", nodeData);
         }
-        private static void addBikeNodeToMap()
+        /*private static void addBikeNodeToMap()
         {
             var nodeData = new
             {
@@ -257,13 +273,13 @@ namespace ClientProgram___correct {
             };
 
             SendTunnelCommand("scene/node/add",nodeData);
-        }
+        }*/
         private static void followRouteWithNode()
         {
             var followData = new
             {
                 route = routeID,
-                node = bikeIDstring,
+                node = cameraIDstring,
                 speed = 10.0,
                 offset = 0.0,
                 rotate = "XYZ",
@@ -359,6 +375,16 @@ namespace ClientProgram___correct {
             routeID = routeTools.uuid;
 
             return routeID;
+        }
+        public static string getCameraID(string cameraDataString)
+        {
+            string cameraID = "";
+            JsonNode jsonNode = JsonNode.Parse(cameraDataString);
+            JsonObject jsonObject = jsonNode.AsObject();
+
+            cameraID = jsonObject["data"]?["data"]?["data"]?[0]?["uuid"]?.ToString();
+
+            return cameraID;
         }
 
         public static string getID(string data) {
