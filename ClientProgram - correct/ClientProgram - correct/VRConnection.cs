@@ -60,6 +60,7 @@ namespace ClientProgram___correct {
 
             uuIDstring = getUUIDstring(dataString);
             Console.WriteLine("De string van de textures " + uuIDstring);
+
             addLayerToNode(uuIDstring);
             await ReadResponse();
 
@@ -68,15 +69,16 @@ namespace ClientProgram___correct {
 
             routeID = getRouteID(dataString);
             Console.WriteLine("Route ID " + routeID);
-
-
+            
             showRouteOnMap();
+            await ReadResponse();
+
+            addRoadTexture(routeID);
             await ReadResponse();
 
             addBikeNodeToMap();
             await ReadResponse();
             bikeIDstring = getUUIDstring(dataString);
-
 
             followRouteWithNode();
             await ReadResponse();
@@ -219,18 +221,12 @@ namespace ClientProgram___correct {
                 name = "terrain",
                 components = new {
                     transform = new {
-                        position = new[] { -128, 1, -128 },
+                        position = new[] { -128, 0, -128 },
                         scale = 1,
                         rotation = new[] { 0, 0, 0 },
                     },
                     terrain = new {
                         smooth = true,
-                    },
-                    panel = new {
-                        size = new[] { 64, 64 },
-                        resolution = new[] { 512, 512 },
-                        background = new[] { 0, 0, 0, 1 },
-                        castShadow = true,
                     }
                 }
             };
@@ -280,16 +276,18 @@ namespace ClientProgram___correct {
         }
         private static void addLayerToNode(string uuid)
         {
+           
             var layerData = new
             {
                 id = uuid,
-                diffuse = "grass.jpg",
-                normal =  "grass.jpg",
-                minHeight = 1,
+                diffuse = "data/NetworkEngine/textures/grass/grass_green_d.jpg" ,
+                normal = "data/NetworkEngine/textures/grass/grass_green_d.jpg",
+                minHeight = -1,
                 maxHeight = 10,
-                fadeDist = 1
+                fadeDist = 1000
             };
             SendTunnelCommand("scene/node/addlayer", layerData);
+            
                 
         }
         private static void addRouteToMap()
@@ -297,10 +295,10 @@ namespace ClientProgram___correct {
             var routeData = new
             {
                 nodes = new[] { 
-                    new { pos = new[] {0,0,0},dir = new[] { 5,0,-5}  },
-                    new { pos = new[] {50,0,0 },dir = new[] {5,0,5} },
-                    new { pos = new[] {50,0,50},dir = new[] {-5,0,5} },
-                    new { pos = new[] {0,0,50 }, dir = new [] {-5,0,-5} }
+                    new { pos = new[] {0,0,0},dir = new[] { 25,0,-50}  },
+                    new { pos = new[] {0,0,-100 },dir = new[] {50,0,90} },
+                    new { pos = new[] {100,0,0},dir = new[] {-70,0,10} },
+                    new { pos = new[] {0,0,100 }, dir = new [] {-80,0,-30} }
                 }
             };
             SendTunnelCommand("route/add",routeData);
@@ -312,6 +310,18 @@ namespace ClientProgram___correct {
                 show = true,
             };
             SendTunnelCommand("route/show",showRouteData);
+        }
+        private static void addRoadTexture(string routeID)
+        {
+            var addRoadData = new
+            {
+                route = routeID,
+                diffuse = "data/NetworkEngine/textures/tarmac_diffuse.png",
+                normal = "data/NetworkEngine/textures/tarmac_normal.png",
+                specular = "data/NetworkEngine/textures/tarmac_specular.png",
+                heightoffset = 0.01
+            };
+            SendTunnelCommand("scene/road/add",addRoadData);
         }
         
         public static string getTunnelId(string tunnelDataString) {
