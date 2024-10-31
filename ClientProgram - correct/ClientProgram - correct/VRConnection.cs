@@ -86,9 +86,13 @@ namespace ClientProgram___correct {
             findCameraNode();
             await ReadResponse();
 
+            Console.WriteLine(dataString);
             cameraIDstring = getCameraID(dataString);
             Console.WriteLine("Camera ID " + cameraIDstring);
             
+            updateCameraNode();
+            await ReadResponse();
+
             followRouteWithNode();
             await ReadResponse();
 
@@ -249,6 +253,25 @@ namespace ClientProgram___correct {
 
             SendTunnelCommand("scene/node/add", nodeData);
         }
+        private static void updateCameraNode()
+        {
+            var cameraNodeData = new
+            {
+                id = cameraIDstring,
+                components = new 
+                {
+                    panel = new
+                    {
+                        size = new[] { 100, 100 },
+                        resolution = new[] { 512, 512 },
+                        background = new[] { 1, 1, 1, 1 },
+                        castShadow = true,
+                    }
+                }
+                
+            };
+            SendTunnelCommand("scene/node/update",cameraNodeData);
+        }
         /*private static void addBikeNodeToMap()
         {
             var nodeData = new
@@ -302,9 +325,7 @@ namespace ClientProgram___correct {
                 maxHeight = 10,
                 fadeDist = 1000
             };
-            SendTunnelCommand("scene/node/addlayer", layerData);
-            
-                
+            SendTunnelCommand("scene/node/addlayer", layerData);      
         }
         private static void addRouteToMap()
         {
