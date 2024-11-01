@@ -38,6 +38,7 @@ namespace ClientProgram___correct {
         public static byte[] prepend;
         public static byte[] data;
 
+
         public static async Task Start() {
             client.Connect(_address, 6666);
             networkStream = client.GetStream();
@@ -126,7 +127,7 @@ namespace ClientProgram___correct {
             } while (readTotal < dataBuffer.Length);
 
             dataString = Encoding.UTF8.GetString(dataBuffer, 0, readTotal);
-            Console.WriteLine("Response: " + Encoding.UTF8.GetString(dataBuffer, 0, readTotal));
+            Console.WriteLine("Response: " + Encoding.UTF8.GetString(dataBuffer, 0, readTotal) + "\n");
 
             /*while (PrependLenght < lengthInt)
             {
@@ -390,38 +391,30 @@ namespace ClientProgram___correct {
         
         public static string getTunnelId(string tunnelDataString) {
             string tunnelId = "";
-            JsonTunnelData tunnelDataObj = JsonConvert.DeserializeObject<JsonTunnelData>(tunnelDataString);
+            JsonNode jsonNode = JsonNode.Parse(tunnelDataString);
+            JsonObject jsonObject = jsonNode.AsObject();
 
-            TunnelData tunnelData = tunnelDataObj.data;
-            tunnelId = tunnelData.id;
-
+            tunnelId = jsonObject["data"]?["id"]?.ToString();
 
             return tunnelId;
         }
-        public static string getUUIDstring(string uuiddataString)
+        public static string getUUIDstring(string uuidDataString)
         {
             string uuid = "";
-            JsonTextureData jsonTextureData = JsonConvert.DeserializeObject<JsonTextureData>(uuiddataString);
+            JsonNode jsonNode = JsonNode.Parse(uuidDataString);
+            JsonObject jsonObject = jsonNode.AsObject();
 
-            TextureScope textureScope = jsonTextureData.data;
-            TextureData textureData = textureScope.data;
-            TextureTools textureTools = textureData.data;
-
-            uuid = textureTools.uuid;
+            uuid = jsonObject["data"]?["data"]?["data"]?["uuid"]?.ToString();
 
             return uuid;
         }
         public static string getRouteID(string routeDataString)
         {
             string routeID = "";
-            JsonRouteData jsonRouteData = JsonConvert.DeserializeObject<JsonRouteData>(routeDataString);
+            JsonNode jsonNode = JsonNode.Parse(routeDataString);
+            JsonObject jsonObject = jsonNode.AsObject();
 
-            RouteScope routeScope = jsonRouteData.data;
-            RouteData routeData = routeScope.data;
-            RouteTools routeTools = routeData.data;
-
-            routeID = routeTools.uuid;
-
+            routeID = jsonObject["data"]?["data"]?["data"]?["uuid"]?.ToString();
             return routeID;
         }
         public static string getCameraID(string cameraDataString)
@@ -481,6 +474,10 @@ namespace ClientProgram___correct {
             }*/
 
         }
+
+        public void setSpeed(int speed) {
+
+        }
         
         //public static void sendTunnel(string command) {
         //    string jsonPacket = "{\"id\" : \"tunnel/send\", \"data\" : {\"dest\" : \"" + tunnelId + "\", \"data\" : " + command + "}}";
@@ -515,16 +512,6 @@ namespace ClientProgram___correct {
 
 
     }
-    
-
-    internal class JsonTunnelData {
-        public string id { get; set; }
-        public TunnelData data { get; set; }
-        public JsonTunnelData(string id, TunnelData data) {
-            this.data = data;
-            this.id = id;
-        }
-    }
 
     internal class JsonData {
         public List<Data> data { get; set; }
@@ -533,17 +520,6 @@ namespace ClientProgram___correct {
             this.data = data;
             this.id = id;
         }
-    }
-    internal class TunnelData {
-        public string status { get; set; }
-        public string id { get; set; }
-       
-        public TunnelData(string status, string id)
-        {
-            this.status = status;
-            this.id = id;
-        }
-
     }
 
     internal class Data {
@@ -585,81 +561,6 @@ namespace ClientProgram___correct {
         public Fps(long time, double fps) {
             this.fps = fps;
             this.time = time;
-        }
-    }
-
-    internal class JsonTextureData
-    {
-        public string id { get; set; }
-        public TextureScope data { get; set; }
-        public JsonTextureData(string id, TextureScope data)
-        {
-            this.id = id;
-            this.data = data;
-        }
-    }
-    internal class TextureScope 
-    {
-        public string id { get; set;}
-        public TextureData data {  get; set; } 
-        public TextureScope(string id, TextureData data)
-        {
-            this.id = id;
-            this.data = data;
-        }
-    }
-    internal class TextureData
-    {
-        public TextureTools data { get; set; }
-        public TextureData(TextureTools data)
-        {
-            this.data = data;
-        }
-    }
-    internal class TextureTools
-    {
-        public string name { get; set; }
-        public string uuid { get; set; }
-        public TextureTools(string name, string uuid)
-        {
-            this.name = name;
-            this.uuid = uuid;
-        }
-    }
-    internal class JsonRouteData
-    {
-        public string id { get; set; }
-        public RouteScope data { get; set; }
-        public JsonRouteData(string id, RouteScope data)
-        {
-            this.id = id;
-            this.data = data;
-        }   
-    }
-    internal class RouteScope
-    {
-        public string id { get; set; }
-        public RouteData data { get; set; }
-        public RouteScope(string id, RouteData data)
-        {
-            this.id = id;
-            this.data = data;
-        }
-    }
-    internal class RouteData
-    {
-        public RouteTools data { get; set; }
-        public RouteData(RouteTools data)
-        {
-            this.data = data;
-        }
-    }
-    internal class RouteTools
-    {
-        public string uuid { get; set; }
-        public RouteTools(string uuid)
-        {
-            this.uuid = uuid;
         }
     }
 }
