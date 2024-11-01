@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Security.Policy;
 using System.Security.Principal;
 using System.Text;
@@ -32,7 +33,7 @@ namespace ClientProgram___correct {
         private static string hudID;
 
         private int _port;
-        private static int bikeSpeed = 10;
+        private static double bikeSpeed = 0;
 
         private static NetworkStream networkStream;
         public static byte[] prepend;
@@ -102,8 +103,8 @@ namespace ClientProgram___correct {
             updateHud();
             await ReadResponse();
 
-         //   followRouteWithNode();
-         //   await ReadResponse();
+            SetupRouteWithNode();
+            await ReadResponse();
         }
 
         private static async Task ReadResponse() {
@@ -299,6 +300,16 @@ namespace ClientProgram___correct {
             };
             SendTunnelCommand("scene/panel/drawtext",speedToHud);
         }
+
+        private async static void updateBikeSpeed() {
+            var speedUpdate = new {
+                node = cameraIDstring,
+                speed = bikeSpeed,
+            };
+
+            SendTunnelCommand("route/follow/speed", speedUpdate);
+            await ReadResponse();
+        }   
         
         /*private static void addBikeNodeToMap()
         {
@@ -325,7 +336,7 @@ namespace ClientProgram___correct {
 
             SendTunnelCommand("scene/node/add",nodeData);
         }*/
-        private static void followRouteWithNode()
+        private static void SetupRouteWithNode()
         {
             var followData = new
             {
@@ -335,7 +346,7 @@ namespace ClientProgram___correct {
                 offset = 0.0,
                 rotate = "XYZ",
                 smoothing = 1.0,
-                followHeight = false,
+                followHeight = true,
                 rotateOffset = new[] { 0, 0,0 },
                 positionOffset = new[] { 0,0,0 }
             };
@@ -428,10 +439,9 @@ namespace ClientProgram___correct {
             return cameraID;
         }
 
-        public static string getID(string data) {
+        public static string getID(string data) 
+        {
             string idHost = "";
-
-
 
             JsonData dataList = JsonConvert.DeserializeObject<JsonData>(data);
             List<Data> dataObject = dataList.data;
@@ -443,9 +453,7 @@ namespace ClientProgram___correct {
                         Console.WriteLine(data1.id);
                         idHost = data1.id;
                     }
-
                 }
-
             }
 
             return idHost;
@@ -477,8 +485,10 @@ namespace ClientProgram___correct {
 
         }
 
-        public void setSpeed(int speed) {
-
+        public static void setSpeed(double speed) 
+        {
+            bikeSpeed = speed * 0.01;
+            updateBikeSpeed();
         }
         
         //public static void sendTunnel(string command) {
