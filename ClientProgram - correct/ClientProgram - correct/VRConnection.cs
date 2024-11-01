@@ -431,13 +431,15 @@ namespace ClientProgram___correct {
         public static string getID(string data) {
             string idHost = "";
 
+
+
             JsonData dataList = JsonConvert.DeserializeObject<JsonData>(data);
             List<Data> dataObject = dataList.data;
 
             foreach (Data data1 in dataObject) {
                 if (data1.features.Contains("tunnel")) {
                     ClientInfo info = data1.clientinfo;
-                    if (info.host.ToLower() == System.Net.Dns.GetHostName().ToLower()) {
+                    if (info.host.ToLower() == Dns.GetHostName().ToLower()) {
                         Console.WriteLine(data1.id);
                         idHost = data1.id;
                     }
