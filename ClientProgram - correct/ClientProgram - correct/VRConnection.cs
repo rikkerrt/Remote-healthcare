@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -30,6 +31,7 @@ namespace ClientProgram___correct {
         private static string bikeIDstring;
         private static string cameraIDstring;
         private static string hudID;
+        
 
         private int _port;
         private static int bikeSpeed = 10;
@@ -88,9 +90,14 @@ namespace ClientProgram___correct {
             findCameraNode();
             await ReadResponse();
 
-            Console.WriteLine(dataString);
-            cameraIDstring = getCameraID(dataString);
+            cameraIDstring = getUtillID(dataString);
             Console.WriteLine("Camera ID " + cameraIDstring);
+
+            updateCamera();
+            await ReadResponse();
+
+            addBikeNode();
+            await ReadResponse();
 
             addHudNode();
             await ReadResponse();
@@ -98,11 +105,20 @@ namespace ClientProgram___correct {
             hudID = getUUIDstring(dataString);
             Console.WriteLine("Hud ID: " +  hudID);
 
-            updateHud();
+            //clearPanel();
+            //await ReadResponse();
+            
+            //swapBuffers();
+            //await ReadResponse();
+
+            //speedToHud();
+            //await ReadResponse();
+
+
+            followRouteWithNode();
             await ReadResponse();
 
-         //   followRouteWithNode();
-         //   await ReadResponse();
+
         }
 
         private static async Task ReadResponse() {
@@ -260,6 +276,7 @@ namespace ClientProgram___correct {
 
             SendTunnelCommand("scene/node/add", nodeData);
         }
+
         private static void addHudNode()
         {
             var nodeData = new
@@ -280,21 +297,73 @@ namespace ClientProgram___correct {
                         resolution = new[] { 512, 512 },
                         background = new[] { 1, 1, 1, 1 },
                         castShadow = true,
-                    }
+                    },
                 }
             };
 
             SendTunnelCommand("scene/node/add",nodeData);
         }
-        private static void updateHud()
+        private static void updateCamera()
+        {
+            var cameraData = new
+            {
+                id = cameraIDstring,
+                transform = new
+                {
+                    position = new[] { 0, 0, 0 },
+                    scale = 1,
+                    rotation = new[] { 0, 0, 0 },
+                }
+            };
+            SendTunnelCommand("scene/node/update",cameraData);
+        }
+        private static void addBikeNode()
+        {
+            var bikeData = new
+            {
+                name = "BikeNode",
+                parent = cameraIDstring,
+                components = new
+                {
+                    transform = new
+                    {
+                        position = new[] { 0, 0, 3 },
+                        scale = 1,
+                        rotation = new[] { 0, -90, 0 }
+                    },
+                    model = new
+                    {
+                        file = "data/NetworkEngine/models/bike/bike.fbx",
+                        cullbackfaces = true,
+                    }
+                }
+            };
+            SendTunnelCommand("scene/node/add",bikeData);
+        }
+        private static void clearPanel()
+        {
+            var clearPanel = new
+            {
+                id = hudID
+            };
+            SendTunnelCommand("scene/panel/clear", clearPanel);
+        }
+        private static void swapBuffers()
+        {
+            var bufferSwap = new
+            {
+                id = hudID
+            };
+            SendTunnelCommand("scene/panel/swap", bufferSwap);
+        }
+        private static void speedToHud()
         {
             var speedToHud = new
             {
                 id = hudID,
-                text = "shalom",
-                position = new[] { 10, 10 },
-                size = 64.0,
-                color = new[] { 0, 0, 0, 1 },
+                text = "Shalom",
+                position = new[] {10,0,0},
+                size = 32.0
             };
             SendTunnelCommand("scene/panel/drawtext",speedToHud);
         }
@@ -424,15 +493,15 @@ namespace ClientProgram___correct {
 
             return routeID;
         }
-        public static string getCameraID(string cameraDataString)
+        public static string getUtillID(string cameraDataString)
         {
-            string cameraID = "";
+            string utillID = "";
             JsonNode jsonNode = JsonNode.Parse(cameraDataString);
             JsonObject jsonObject = jsonNode.AsObject();
 
-            cameraID = jsonObject["data"]?["data"]?["data"]?[0]?["uuid"]?.ToString();
+            utillID = jsonObject["data"]?["data"]?["data"]?[0]?["uuid"]?.ToString();
 
-            return cameraID;
+            return utillID;
         }
 
         public static string getID(string data) {
