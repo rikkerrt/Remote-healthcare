@@ -24,7 +24,8 @@ namespace FietsDemo
         static IBike sim;
         static StreamWriter writer;
         static Stream stm;
-        static DataProtocol dataProtocol;    
+        //static DataProtocol dataProtocol;
+        static bool sendData;
 
         public static void Main()
         {
@@ -37,7 +38,8 @@ namespace FietsDemo
             //    //Console.WriteLine();   
             //}
             sim = new Simulation(3);
-            dataProtocol = new DataProtocol(sim); 
+            //dataProtocol = new  DataProtocol(sim); 
+            sendData = false;
 
 
             //while (true)
@@ -94,6 +96,9 @@ namespace FietsDemo
             {
                 while (true)
                 {
+                    if (sendData)
+                    {
+                  
                     Data data = new Data(ID, 15, 16, 10, 76, 8);
 
                     string input = sim.getSpeed();
@@ -112,6 +117,8 @@ namespace FietsDemo
 
                     System.Threading.Thread.Sleep(10000);
 
+                    }
+
                 }
             } 
             catch (Exception e) 
@@ -129,7 +136,29 @@ namespace FietsDemo
                     byte[] b = new byte[100];
                     int k = stm.Read(b, 0, b.Length);
                     string s = System.Text.Encoding.ASCII.GetString(b);
-                    
+                    if (s.StartsWith("sendData"))
+                    {
+                        string send = (s.Split(' ')[1]);
+                        if (s.Contains("true"))
+                        {
+                            sendData = true;
+                        }
+
+                        if (s.Contains("false"))
+                        {
+                            sendData = false;
+                        }
+
+
+                        Console.WriteLine("ik ben nu: "+send);
+                    }
+
+                    else if (s.StartsWith("message"))
+                    {
+                        string message = (s.Split('|')[1]);
+                        Console.WriteLine(message);
+                    }
+
                 }
             }
             catch (Exception e)

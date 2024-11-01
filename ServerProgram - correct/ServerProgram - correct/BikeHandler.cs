@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 
 namespace ServerProgram___correct
 {
-    internal class BikeHandler
+   
+    public class BikeHandler
     {
+        private DoctorHandler DoctorHandler { get; set; } 
         private Socket Socket;
         private int BikeId;
 
@@ -19,11 +21,17 @@ namespace ServerProgram___correct
             BikeId = bikeId;
         }
 
+        public void SetDoctorHandler(DoctorHandler doctorHandler)
+        {
+            DoctorHandler = doctorHandler;
+        }
+
+
         public void HandleBike()
         {
 
             ASCIIEncoding asen = new ASCIIEncoding();
-            Socket.Send(asen.GetBytes(Socket.ToString()));
+            Socket.Send(asen.GetBytes(BikeId.ToString()));
             while (true)
             {
                 try
@@ -37,20 +45,18 @@ namespace ServerProgram___correct
                         break;
                     }
 
+
                     string jsonData = Encoding.ASCII.GetString(buffer, 0, receivedBytes).Trim();
-                    Console.WriteLine("Ontvangen Data: " + jsonData);
 
-                    Data dataObject = JsonConvert.DeserializeObject<Data>(jsonData);
-
-                    if (dataObject != null)
+                    if (DoctorHandler != null)
                     {
-                        Console.WriteLine("Ontvangen dataobject:");
-                        Console.WriteLine(dataObject.ToString());
+                        DoctorHandler.SendHealthDataToDoctor(jsonData);
                     }
                     else
                     {
-                        Console.WriteLine("Error met deserializen.");
+                        Console.WriteLine("Error: DoctorHandler is niet ingesteld.");
                     }
+                    
                 }
                 catch (Exception e)
                 {

@@ -8,10 +8,12 @@ using System.Threading.Tasks;
 
 namespace ServerProgram___correct
 {
-    internal class DoctorHandler
+    public class DoctorHandler
     {
 
         private Socket Socket;
+        private Dictionary<int, ClientSession> clientSessions = new Dictionary<int, ClientSession>();
+
 
         public DoctorHandler(Socket socket)
         {
@@ -22,6 +24,7 @@ namespace ServerProgram___correct
         {
             ASCIIEncoding asen = new ASCIIEncoding();
             Socket.Send(asen.GetBytes(Socket.ToString()));
+            SendBikeClientList();
 
             while (true)
             {
@@ -36,9 +39,10 @@ namespace ServerProgram___correct
                     Console.WriteLine(s);
 
 
-                    if (s.StartsWith("WW"))
+                    if (s.StartsWith("DATA"))
                     {
-                        Socket.Send(asen.GetBytes("true"));
+
+                        Console.WriteLine("IK HEB DATA ONTVANGEN");
 
 
                     }
@@ -46,6 +50,19 @@ namespace ServerProgram___correct
                     if (s.StartsWith("getBikes"))
                     {
                         SendBikeClientList();
+                        NotifyDoctorAboutNewBikeClient();
+                    }
+                    
+                    if (s.StartsWith("Start"))
+                    {
+
+                        int id = int.Parse(s.Split(' ')[1]);
+                        Console.WriteLine("Start sessie voor client met ID: " + id);
+
+                        SendMessageToClient(id, "sendData| true");
+
+
+
                     }
 
                     if (s.StartsWith("SendMessageToClient"))
@@ -73,8 +90,6 @@ namespace ServerProgram___correct
                     }
 
 
-
-
                     else
                     {
                         Socket.Send(asen.GetBytes("Je bent geïntialiseerd als niks"));
@@ -92,26 +107,26 @@ namespace ServerProgram___correct
             Socket.Close();
         }
 
-        private void SendBikeClientList()
+        public void SendBikeClientList()
         {
-            ASCIIEncoding asen = new ASCIIEncoding();
-            List<Data> bikeData = new List<Data>();
+            List<int> bikeData = new List<int>();
 
             foreach (var bikeClient in server.bikeClients)
             {
                 int bikeId = bikeClient.Key;
-                bikeData.Add(new Data(bikeId, 0, 0, 0, 0, 0));
-       
+                bikeData.Add(bikeId);
             }
 
-            string bikeDataString = JsonConvert.SerializeObject(bikeData);
+
+            ASCIIEncoding asen = new ASCIIEncoding();
+
+            string bikeDataString = "bikeclients|"+JsonConvert.SerializeObject(bikeData);
 
             byte[] messageBytes = asen.GetBytes(bikeDataString);
-            Console.WriteLine(messageBytes);
-            Socket.Send(messageBytes);
-            Console.WriteLine("Bytes Sent: " + BitConverter.ToString(messageBytes));
-
+            Socket.Send(messageBytes); 
+            Console.WriteLine("Fietsclients naar dokter verzonden: " + BitConverter.ToString(messageBytes));
         }
+
 
         private void SendMessageToClient(int ID, string Message)
         {
@@ -138,5 +153,35 @@ namespace ServerProgram___correct
             }
         }
 
+        public void SendHealthDataToDoctor(String data)
+        {
+
+            Console.WriteLine(data);
+            ASCIIEncoding asen = new ASCIIEncoding();
+
+            string bikeDataString = "DATA|" + data;
+
+            byte[] messageBytes = asen.GetBytes(bikeDataString);
+            Socket.Send(messageBytes);
+        }
+
+        public void NotifyDoctorAboutNewBikeClient()
+        {
+            SendBikeClientList();
+        }
+
+    }
+
+    public class ClientSession
+    {
+        public bool IsSessionActive { get; set; }
+        public List<string> HealthData { get; set; }
+        public System.Timers.Timer DataTimer { get; set; }
+
+        public ClientSession()
+        {
+            IsSessionActive = false;
+            HealthData = new List<string>();
+        }
     }
 }

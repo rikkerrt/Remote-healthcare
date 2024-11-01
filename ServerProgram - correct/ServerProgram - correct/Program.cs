@@ -1,23 +1,23 @@
-﻿using System;
-using System.Text;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
-using Newtonsoft.Json;
+﻿using ServerProgram___correct;
 using System.Collections.Generic;
-using ServerProgram___correct;
-
-
+using System.Net.Sockets;
+using System.Net;
+using System.Text;
+using System.Threading;
+using System;
 
 public class server
 {
     static int i = 0;
     public static Dictionary<int, Socket> bikeClients = new Dictionary<int, Socket>();
+    public static DoctorHandler doctorHandler;
+    public static List<BikeHandler> bikeHandlers = new List<BikeHandler>();
+
     public static void Main()
     {
         try
         {
-            Data data = new Data(10, 1.1, 2.2, 10, 3,8);
+            Data data = new Data(10, 1.1, 2.2, 10, 3, 8);
             TcpListener myList = new TcpListener(IPAddress.Any, 8001);
             myList.Start();
             Console.WriteLine("The server is running at port 8001...");
@@ -25,14 +25,11 @@ public class server
 
             while (true)
             {
-
                 Socket s = myList.AcceptSocket();
                 Console.WriteLine("Connection accepted from " + s.RemoteEndPoint);
                 Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClient));
                 clientThread.Start(s);
             }
-
-
         }
         catch (Exception e)
         {
@@ -41,12 +38,11 @@ public class server
     }
 
     private static void HandleClient(Object object1)
-
     {
         Socket socket = object1 as Socket;
         byte[] b = new byte[100];
         int k = socket.Receive(b);
-        Console.WriteLine("Recieved...");
+        Console.WriteLine("Received...");
 
         String s = System.Text.Encoding.ASCII.GetString(b);
         Console.WriteLine(s);
@@ -55,55 +51,67 @@ public class server
 
         if (s.StartsWith("f"))
         {
-            //Thread.Sleep(5000);
-            //Console.WriteLine("i have given id");
             HandleBike(socket);
-
         }
-
         else if (s.StartsWith("d"))
         {
             HandleDoctor(socket);
-
-
         }
-
         else
         {
             socket.Send(asen.GetBytes("Je bent geïntialiseerd als niks"));
-
         }
         socket.Close();
-
     }
 
     public static void HandleBike(Socket socket)
     {
         i++;
-        ASCIIEncoding asen = new ASCIIEncoding();
         bikeClients.Add(i, socket);
         Console.WriteLine("Fiets-client verbonden met ID: " + i);
 
-        BikeHandler bikeHandler = new BikeHandler(socket, i);
-        bikeHandler.HandleBike();
-        bikeClients.Remove(i);
+        if (doctorHandler != null)
+        {
+            doctorHandler.NotifyDoctorAboutNewBikeClient();
+        }
 
+
+        BikeHandler bikeHandler = new BikeHandler(socket, i);
+        if (doctorHandler != null)
+        {
+            bikeHandler.SetDoctorHandler(doctorHandler);
+        }
+
+        else
+        {
+            Console.WriteLine("doktor kan niet wroden ingesteld.");
+            bikeHandlers.Add(bikeHandler);
+        }
+        bikeHandler.HandleBike();
+
+        bikeClients.Remove(i);
     }
 
     public static void HandleDoctor(Socket socket)
     {
+        doctorHandler = new DoctorHandler(socket);
 
-        //ASCIIEncoding asen = new ASCIIEncoding();
-        //socket.Send(asen.GetBytes(i + ""));
+        doctorHandler.SendBikeClientList();
 
-        DoctorHandler DoctorHandler = new DoctorHandler(socket);
-        DoctorHandler.HandleDoctor();
+        doctorHandler.HandleDoctor();
 
+        if (bikeHandlers.Count > 0) 
+        {
+            foreach (var bikeHandler in bikeHandlers)
+            {
+                bikeHandler.SetDoctorHandler(doctorHandler);
+            }
+        }
 
         socket.Close();
-
     }
 }
+
 
 [Serializable]
 public class Data
