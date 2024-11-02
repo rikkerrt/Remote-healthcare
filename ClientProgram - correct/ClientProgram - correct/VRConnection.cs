@@ -31,7 +31,7 @@ namespace ClientProgram___correct {
         private static string bikeIDstring;
         private static string cameraIDstring;
         private static string hudID;
-        
+
 
         private int _port;
         private static int bikeSpeed = 10;
@@ -76,7 +76,7 @@ namespace ClientProgram___correct {
 
             routeID = getRouteID(dataString);
             Console.WriteLine("Route ID " + routeID);
-            
+
             showRouteOnMap();
             await ReadResponse();
 
@@ -93,9 +93,6 @@ namespace ClientProgram___correct {
             cameraIDstring = getUtillID(dataString);
             Console.WriteLine("Camera ID " + cameraIDstring);
 
-            updateCamera();
-            await ReadResponse();
-
             addBikeNode();
             await ReadResponse();
 
@@ -103,17 +100,16 @@ namespace ClientProgram___correct {
             await ReadResponse();
 
             hudID = getUUIDstring(dataString);
-            Console.WriteLine("Hud ID: " +  hudID);
+            Console.WriteLine("Hud ID: " + hudID);
 
-            //clearPanel();
-            //await ReadResponse();
-            
-            //swapBuffers();
-            //await ReadResponse();
+            clearPanel();
+            await ReadResponse();
 
-            //speedToHud();
-            //await ReadResponse();
+            speedToHud();
+            await ReadResponse();
 
+            swapBuffers();
+            await ReadResponse();
 
             followRouteWithNode();
             await ReadResponse();
@@ -133,7 +129,7 @@ namespace ClientProgram___correct {
             int lengthInt = BitConverter.ToInt32(length, 0);
             //Console.WriteLine(lengthInt);
             byte[] dataBuffer = new byte[lengthInt];
-            
+
             int readTotal = 0;
             do {
                 int read = await networkStream.ReadAsync(dataBuffer, readTotal, dataBuffer.Length - readTotal);
@@ -190,7 +186,7 @@ namespace ClientProgram___correct {
                     key = ""
                 }
             };
-            
+
             string jsonPacket = JsonConvert.SerializeObject(tunnelCommand);
             byte[] data = Encoding.ASCII.GetBytes(jsonPacket);
             byte[] prepend = BitConverter.GetBytes(data.Length);
@@ -199,7 +195,7 @@ namespace ClientProgram___correct {
 
         public static void clearScene() {
             var clearData = new {
-                
+
             };
 
             SendTunnelCommand("scene/reset", clearData);
@@ -245,7 +241,7 @@ namespace ClientProgram___correct {
             {
                 for (int y = 0; y < height; y++)
                 {
-                    heights[x, y] = 0;
+                    heights[x, y] = 2 + (float)(Math.Sin(x / 10.0) + Math.Cos(y / 10.0));
                 }
             }
 
@@ -282,14 +278,14 @@ namespace ClientProgram___correct {
             var nodeData = new
             {
                 name = "hudNode",
-                parent = cameraIDstring,
+                
                 components = new
                 {
-                    transform = new 
+                    transform = new
                     {
-                        position = new[] { 1.5,0.75, 1 },
+                        position = new[] { 1.5, 0.75, 1 },
                         scale = 1,
-                        rotation = new[] { 0,0,0 },
+                        rotation = new[] { 0, 0, 0 },
                     },
                     panel = new
                     {
@@ -301,21 +297,7 @@ namespace ClientProgram___correct {
                 }
             };
 
-            SendTunnelCommand("scene/node/add",nodeData);
-        }
-        private static void updateCamera()
-        {
-            var cameraData = new
-            {
-                id = cameraIDstring,
-                transform = new
-                {
-                    position = new[] { 0, 0, 0 },
-                    scale = 1,
-                    rotation = new[] { 0, 0, 0 },
-                }
-            };
-            SendTunnelCommand("scene/node/update",cameraData);
+            SendTunnelCommand("scene/node/add", nodeData);
         }
         private static void addBikeNode()
         {
@@ -327,7 +309,7 @@ namespace ClientProgram___correct {
                 {
                     transform = new
                     {
-                        position = new[] { 0, 0, 3 },
+                        position = new[] { 0, 0, 2.75 },
                         scale = 1,
                         rotation = new[] { 0, -90, 0 }
                     },
@@ -338,7 +320,7 @@ namespace ClientProgram___correct {
                     }
                 }
             };
-            SendTunnelCommand("scene/node/add",bikeData);
+            SendTunnelCommand("scene/node/add", bikeData);
         }
         private static void clearPanel()
         {
@@ -362,12 +344,14 @@ namespace ClientProgram___correct {
             {
                 id = hudID,
                 text = "Shalom",
-                position = new[] {10,0,0},
-                size = 32.0
+                position = new[] { 0.0,0.0, 0.0 },
+                size = 32.0,
+                color = new[] { 0, 0, 0, 1 },
+                font = "segoeui"
             };
-            SendTunnelCommand("scene/panel/drawtext",speedToHud);
+            SendTunnelCommand("scene/panel/drawtext", speedToHud);
         }
-        
+
         /*private static void addBikeNodeToMap()
         {
             var nodeData = new
@@ -403,35 +387,38 @@ namespace ClientProgram___correct {
                 offset = 0.0,
                 rotate = "XYZ",
                 smoothing = 1.0,
-                followHeight = false,
-                rotateOffset = new[] { 0, 0,0 },
-                positionOffset = new[] { 0,0,0 }
+                followHeight = true,
+                rotateOffset = new[] { 0, 0, 0 },
+                positionOffset = new[] { 0, 0, 0 }
             };
             SendTunnelCommand("route/follow", followData);
         }
         private static void addLayerToNode(string uuid)
         {
-           
+
             var layerData = new
             {
                 id = uuid,
-                diffuse = "data/NetworkEngine/textures/grass/grass_green_d.jpg" ,
+                diffuse = "data/NetworkEngine/textures/grass/grass_green_d.jpg",
                 normal = "data/NetworkEngine/textures/grass/grass_green_d.jpg",
                 minHeight = -1,
                 maxHeight = 10,
                 fadeDist = 1000
             };
-            SendTunnelCommand("scene/node/addlayer", layerData);      
+            SendTunnelCommand("scene/node/addlayer", layerData);
         }
         private static void addRouteToMap()
         {
             var routeData = new
             {
-                nodes = new[] { 
-                    new { pos = new[] {0,0,0},dir = new[] { 25,0,-50}  },
-                    new { pos = new[] {0,0,-100 },dir = new[] {50,0,90} },
-                    new { pos = new[] {100,0,0},dir = new[] {-70,0,10} },
-                    new { pos = new[] {0,0,100 }, dir = new [] {-80,0,-30} }
+                nodes = new[] {
+                        new { pos = new[] { -100, 0, 100 }, dir = new[] { 20, 0, -40 } },
+                        new { pos = new[] { -20, 0, 40 }, dir = new[] { 50, 0, -10 } },
+                        new { pos = new[] { 40, 0, 50 }, dir = new[] { 40, 0, -60 } },
+                        new { pos = new[] { 100, 0, -10 }, dir = new[] { -20, 0, -50 } },
+                        new { pos = new[] { 60, 0, -70 }, dir = new[] { -40, 0, -30 } },
+                        new { pos = new[] { 10, 0, -100 }, dir = new[] { -30, 0, 20 } },
+                        new { pos = new[] { -100, 0, 100 }, dir = new[] { 0, 0, 0 } },
                 }
             };
             SendTunnelCommand("route/add",routeData);
