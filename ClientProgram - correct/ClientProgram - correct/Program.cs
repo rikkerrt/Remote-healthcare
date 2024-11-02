@@ -26,6 +26,7 @@ namespace FietsDemo
             {
                 string input = sim.getSpeed();
                 Console.WriteLine(Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2)));
+                VRConnection.setSpeed(Calculations.GetSpeed(input.Substring(2), input.Substring(0,2)));
                 Thread.Sleep(500);
                 //Console.WriteLine();   
             }
