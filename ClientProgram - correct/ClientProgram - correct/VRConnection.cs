@@ -278,7 +278,7 @@ namespace ClientProgram___correct {
             var nodeData = new
             {
                 name = "hudNode",
-                
+                parent = cameraIDstring,
                 components = new
                 {
                     transform = new
