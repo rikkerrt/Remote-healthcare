@@ -541,7 +541,7 @@ namespace ClientProgram___correct {
 
         public static void setSpeed(double speed) 
         {
-            bikeSpeed = speed * 0.01;
+            bikeSpeed = speed * 0.1;
             updateBikeSpeed();
         }
         
