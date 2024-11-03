@@ -289,9 +289,9 @@ namespace ClientProgram___correct {
                     },
                     panel = new
                     {
-                        size = new[] { 1, 0.4 },
+                        size = new[] { 1, 1 },
                         resolution = new[] { 512, 512 },
-                        background = new[] { 1, 1, 1, 1 },
+                        background = new[] { 0, 0, 0, 1 },
                         castShadow = true,
                     },
                 }
@@ -343,10 +343,10 @@ namespace ClientProgram___correct {
             var speedToHud = new
             {
                 id = hudID,
-                text = "Shalom",
-                position = new[] { 0.0,0.0, 0.0 },
-                size = 32.0,
-                color = new[] { 0, 0, 0, 1 },
+                text = bikeSpeed.ToString() + " km/h",
+                position = new[] {75.0,75.0},
+                size = 50.0,
+                color = new[] { 1, 1, 1, 1 },
                 font = "segoeui"
             };
             SendTunnelCommand("scene/panel/drawtext", speedToHud);
