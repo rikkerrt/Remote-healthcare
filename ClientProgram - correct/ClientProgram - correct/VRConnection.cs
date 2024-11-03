@@ -36,6 +36,7 @@ namespace ClientProgram___correct {
 
         private int _port;
         private static double bikeSpeed = 0;
+        private static bool emergenceStop= false;
 
         private static NetworkStream networkStream;
         public static byte[] prepend;
@@ -541,8 +542,16 @@ namespace ClientProgram___correct {
 
         public static void setSpeed(double speed) 
         {
-            bikeSpeed = speed * 0.01;
+            if (!emergenceStop) {
+                bikeSpeed = speed * 0.1;
+                updateBikeSpeed();
+            }
+        }
+
+        public static void setEmergencyStop(bool stop) {
+            bikeSpeed = 0;
             updateBikeSpeed();
+            emergenceStop = stop;
         }
         
         //public static void sendTunnel(string command) {
