@@ -64,19 +64,18 @@ namespace DoctorClient
 
         private Boolean CheckPassword(string password)
         {
-            //connection.Write("WW|" + password);
+            connection.Write("WW|" + password);
 
-            ////string input = connection.CheckPassword().ToString();
-            ////connection.Write(input);
+            //string input = connection.CheckPassword().ToString();
+            //connection.Write(input);
 
 
-            //if (connection.CheckPassword())
-            //{
-            //    return true;
-            //}
+            if (connection.CheckPassword())
+            {
+                return true;
+            }
 
-            //else return false;
-            return true;
+            else return false;
         }
 
 

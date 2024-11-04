@@ -14,6 +14,7 @@ namespace ClientProgram {
         private string Speed = "00";
         private string Distance = "00";
         private int Duration = 0;
+        private int Resistance = 0;
         private string HeartBeat = "00";
         private Random r = new Random(); 
         private bool up = true;
@@ -181,6 +182,7 @@ namespace ClientProgram {
         public void sendResistance(int resistance)
         {
             Console.WriteLine(resistance);
+            Resistance = resistance;
         }
 
 
@@ -204,6 +206,11 @@ namespace ClientProgram {
         public string getHeartBeat()
         {
             return HeartBeat;
+        }
+
+        public int getResistance()
+        {
+            return Resistance;
         }
     }
 }

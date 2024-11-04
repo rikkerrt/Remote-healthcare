@@ -17,13 +17,17 @@ namespace ServerProgram___correct
         private Dictionary<int, ClientSession> clientSessions = new Dictionary<int, ClientSession>();
         private string RightPassword;
         private DataStorage DataStorage;
+        private string clientKey;
+        private string serverKey;
 
 
-        public DoctorHandler(Socket socket, DataStorage dataStorage)
+        public DoctorHandler(Socket socket, DataStorage dataStorage, string appKey, string serKey)
         {
             Socket = socket;
             RightPassword = "pieter";
-            DataStorage = dataStorage;  
+            DataStorage = dataStorage;
+            clientKey = appKey;
+            serverKey = serKey;
         }
 
         public void HandleDoctor()
@@ -38,11 +42,14 @@ namespace ServerProgram___correct
                 try
                 {
 
-                    byte[] b = new byte[10024];
-                    int k = Socket.Receive(b);
+                    byte[] buffer = new byte[10024];
+                    int bytesRead = Socket.Receive(buffer);
+                    byte[] result = new byte[bytesRead];
+                    Array.Copy(buffer, result, bytesRead);
+
                     Console.WriteLine("Recieved...");
 
-                    String s = System.Text.Encoding.ASCII.GetString(b,0,k);
+                    String s = encryption.Decrypt(serverKey, result);
                     Console.WriteLine(s);
 
 
@@ -53,14 +60,11 @@ namespace ServerProgram___correct
 
                         if (PassWord.Equals(RightPassword))
                         {
-                            byte[] messageBytes = asen.GetBytes("WW|true");
-                           
-                            Socket.Send(messageBytes);
+                            Socket.Send(encryption.Encrypt(clientKey, "WW|true"));
                         }
                         else
                         {
-                            byte[] messageBytes = asen.GetBytes("WW|false");
-                            Socket.Send(messageBytes);
+                            Socket.Send(encryption.Encrypt(clientKey, "WW|false"));
                         }
                     }
 
@@ -68,7 +72,8 @@ namespace ServerProgram___correct
                     {
                         Dictionary<int, List<Data>> History = DataStorage.getAllData();
                         string bikeDataString = "HISTORY|" + JsonConvert.SerializeObject(History);
-                        byte[] messageBytes = asen.GetBytes(bikeDataString);
+                        Console.WriteLine(bikeDataString);
+                        byte[] messageBytes = Encoding.ASCII.GetBytes(bikeDataString);
                         Socket.Send(messageBytes);
                     }
 
@@ -102,9 +107,9 @@ namespace ServerProgram___correct
                     
                     if (s.StartsWith("RESISTANCE"))
                     {
-                        int id = int.Parse(s.Split(' ')[1]);
+                        int id = int.Parse(s.Split('|')[1]);
                         int Resistance = int.Parse(s.Split('|')[2]);
-                        SendMessageToClient(id, "RESISTANCE"+Resistance);
+                        SendMessageToClient(id, "RESISTANCE|"+Resistance);
                         Console.WriteLine("Deze resistance" + Resistance + "word ingesteld bij: " + id);
 
                     }
@@ -157,7 +162,7 @@ namespace ServerProgram___correct
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Error met ontvangen van data: " + e.Message);
+                    Console.WriteLine("Error met ontvangen van data: " + e);
                     break;
                 }
 
@@ -177,19 +182,22 @@ namespace ServerProgram___correct
                 bikeData1.Add(bikeId);
             }
 
+            
+
 
             ASCIIEncoding asen = new ASCIIEncoding();
 
             string bikeDataString = "bikeclients|"+JsonConvert.SerializeObject(bikeData1);
 
             byte[] messageBytes = asen.GetBytes(bikeDataString);
-            Socket.Send(messageBytes); 
+            Socket.Send(encryption.Encrypt(clientKey, bikeDataString)); 
             Console.WriteLine("Fietsclients naar dokter verzonden: " + BitConverter.ToString(messageBytes));
         }
 
 
         private void SendMessageToClient(int ID, string Message)
         {
+            Dictionary<Socket, string> keyList = server.keyList;
             foreach (var bikeClient in server.bikeClients)
             {
                 int bikeId = bikeClient.Key;
@@ -201,7 +209,7 @@ namespace ServerProgram___correct
                     {
                         byte[] messageBytes = Encoding.ASCII.GetBytes(Message);
 
-                        clientSocket.Send(messageBytes);
+                        clientSocket.Send(encryption.Encrypt(keyList[clientSocket], Message));
                     }
                     else
                     {
@@ -215,6 +223,7 @@ namespace ServerProgram___correct
 
         private void SendMessageToClient(string Message)
         {
+            Dictionary<Socket, string> keyList = server.keyList;
             foreach (var bikeClient in server.bikeClients)
             {
                 Socket clientSocket = bikeClient.Value;
@@ -222,7 +231,7 @@ namespace ServerProgram___correct
                 if (clientSocket.Connected)
                 {
                     byte[] messageBytes = Encoding.ASCII.GetBytes(Message);
-                    clientSocket.Send(messageBytes);
+                    clientSocket.Send(encryption.Encrypt(keyList[clientSocket], Message));
                 }
                 else
                 {
@@ -239,8 +248,8 @@ namespace ServerProgram___correct
 
             string bikeDataString = "DATA|" + data;
 
-            byte[] messageBytes = asen.GetBytes(bikeDataString);
-            Socket.Send(messageBytes);
+            //byte[] messageBytes = asen.GetBytes(bikeDataString);
+            Socket.Send(encryption.Encrypt(clientKey, bikeDataString));
         }
 
         public void NotifyDoctorAboutNewBikeClient()

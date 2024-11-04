@@ -19,15 +19,29 @@ namespace DoctorClient
         private ASCIIEncoding asen;
         private bool isListening;
         private bool PasswordCheck;
+        private string publicKey;
+        private string privateKey;
+        private string serverKey;
 
         public void Connect()
         {
             TcpClient tcpclnt = new TcpClient();
             tcpclnt.Connect(IPAddress.Loopback, 8001);
             PasswordCheck = false;
-
-
             Stream = tcpclnt.GetStream();
+
+            (publicKey, privateKey) = encryption.GenerateKeys();
+
+            //recieve serverKey
+            byte[] buffer = new byte[2048];
+            int bytesRead = Stream.Read(buffer, 0, buffer.Length);
+            byte[] result = new byte[bytesRead];
+            Array.Copy(buffer, result, bytesRead);
+            serverKey = Encoding.UTF8.GetString(result);
+
+            //send public key
+            Stream.Write(Encoding.ASCII.GetBytes(publicKey), 0, Encoding.ASCII.GetBytes(publicKey).Length);
+
             asen = new ASCIIEncoding();
 
 
@@ -37,7 +51,7 @@ namespace DoctorClient
 
         public void Write(string s)
         {
-            byte[] data = asen.GetBytes(s);
+            byte[] data = encryption.Encrypt(serverKey, s);
             Stream.Write(data, 0, data.Length);
         }
 
@@ -102,9 +116,19 @@ namespace DoctorClient
 
                     if (bytesRead > 0)
                     {
-                        string message = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                        byte[] result = new byte[bytesRead];
+                        Array.Copy(buffer, result, bytesRead);
+                        string normalMessage = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                        string message = encryption.Decrypt(privateKey, result);
 
-                        if (message.StartsWith("message"))
+                        if (normalMessage.StartsWith("HISTORY"))
+                        {
+                            string[] parts = message.Split("|");
+
+                            Dictionary<int, List<Data>> History = JsonConvert.DeserializeObject<Dictionary<int, List<Data>>>(parts[1]);
+                            MainWindow.UpdateHistory(History);
+                        }
+                        else if (message.StartsWith("message"))
                         {
                         }
                         else if (message.StartsWith("bikeclients"))
@@ -115,7 +139,7 @@ namespace DoctorClient
 
                             MainWindow.UpdateBikeClient(bikeClients);
                         }
-                        else if(message.StartsWith("DATA"))
+                        else if (message.StartsWith("DATA"))
                         {
                             string[] parts = message.Split("|");
 
@@ -127,18 +151,19 @@ namespace DoctorClient
                             MainWindow.UpdateBikeData(data1);
 
                         }
-                        
-                        else if(message.StartsWith("WW"))
+
+                        else if (message.StartsWith("WW"))
                         {
 
                             string PassWord = message.Split('|')[1];
-                            
-                            if (message.Contains("true")){
+
+                            if (message.Contains("true"))
+                            {
                                 PasswordCheck = true;
                                 Write("het is goed");
                             }
-                            else 
-                            { 
+                            else
+                            {
                                 PasswordCheck = false;
                                 Write("het is fout");
                             }

@@ -81,6 +81,7 @@
     <Compile Include="Calculations.cs" />
     <Compile Include="Connection.cs" />
     <Compile Include="DataProtocol.cs" />
+    <Compile Include="Encryption.cs" />
     <Compile Include="IBike.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -11,9 +11,12 @@ public class server
     static int BikeID = 0;
     public static Dictionary<int, Socket> bikeClients = new Dictionary<int, Socket>();
     public static Dictionary<string, Socket> bikeClients1 = new Dictionary<string, Socket>();
+    public static Dictionary<Socket, string> keyList = new Dictionary<Socket, string>();
     public static DoctorHandler doctorHandler;
     public static List<BikeHandler> bikeHandlers = new List<BikeHandler>();
     private static DataStorage DataStorage;
+    private static string privateKey;
+    private static string publicKey;
 
     public static void Main()
     {
@@ -22,7 +25,7 @@ public class server
             DataStorage = new DataStorage("data.json");
             BikeID = DataStorage.getHighestID();
 
-
+            (publicKey, privateKey) = encryption.GenerateKeys();
 
 
             Data data = new Data(10, 1.1, 2.2, 10, 3, 8, "name");
@@ -48,32 +51,48 @@ public class server
     private static void HandleClient(Object object1)
     {
         Socket socket = object1 as Socket;
-        byte[] b = new byte[100];
-        int k = socket.Receive(b);
+
+        // send public key
+        socket.Send(Encoding.ASCII.GetBytes(publicKey));
+
+        // recieve public key client
+        byte[] buffer = new byte[2048];
+        int bytesRead = socket.Receive(buffer);
+        byte[] result = new byte[bytesRead];
+        Array.Copy(buffer, result, bytesRead);
+
+        string clientKey = Encoding.ASCII.GetString(result);
+
+        //what kind of client
+        buffer = new byte[2048];
+        bytesRead = socket.Receive(buffer);
+        result = new byte[bytesRead];
+        Array.Copy(buffer, result, bytesRead);
+        String s = encryption.Decrypt(privateKey, result);
+
         Console.WriteLine("Received...");
 
-        String s = System.Text.Encoding.ASCII.GetString(b);
         Console.WriteLine(s);
-
-        ASCIIEncoding asen = new ASCIIEncoding();
 
         if (s.StartsWith("f"))
         {
-            HandleBike(socket,s);
+            HandleBike(socket,s, clientKey);
         }
         else if (s.StartsWith("d"))
         {
-            HandleDoctor(socket);
+            HandleDoctor(socket, clientKey);
         }
         else
         {
-            socket.Send(asen.GetBytes("Je bent geïntialiseerd als niks"));
+
+            socket.Send(encryption.Encrypt(clientKey, "Je bent geïntialiseerd als niks"));
         }
         socket.Close();
     }
 
-    public static void HandleBike(Socket socket, string message)
+    public static void HandleBike(Socket socket, string message, string clientKey)
     {
+        keyList.Add(socket, clientKey);
         string name = (message.Split('|')[1]);
         BikeID++;
         bikeClients.Add(BikeID, socket);
@@ -86,7 +105,7 @@ public class server
         }
 
 
-        BikeHandler bikeHandler = new BikeHandler(socket, BikeID, DataStorage);
+        BikeHandler bikeHandler = new BikeHandler(socket, BikeID, DataStorage, clientKey, privateKey);
         if (doctorHandler != null)
         {
             bikeHandler.SetDoctorHandler(doctorHandler);
@@ -102,9 +121,9 @@ public class server
         bikeClients.Remove(BikeID);
     }
 
-    public static void HandleDoctor(Socket socket)
+    public static void HandleDoctor(Socket socket, string docterKey)
     {
-        doctorHandler = new DoctorHandler(socket,DataStorage);
+        doctorHandler = new DoctorHandler(socket,DataStorage, docterKey, privateKey);
 
         doctorHandler.SendBikeClientList();
 

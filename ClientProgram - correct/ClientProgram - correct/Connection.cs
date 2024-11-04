@@ -14,6 +14,7 @@ namespace ClientProgram___correct
         private static string Duration = "00";
         private static string Distance = "00";
         private static string HeartBeat = "00";
+        private static int Resistance = 0;
         private static BLE bleBike;
 
 
@@ -113,6 +114,7 @@ namespace ClientProgram___correct
 
         public void sendResistance(int resistance)
         {
+            Resistance = resistance;
             byte data = 0x00;
             if (resistance > 200)
             {
@@ -183,6 +185,11 @@ namespace ClientProgram___correct
         public string getDuration()
         {
             return Duration;
+        }
+
+        public int getResistance()
+        {
+            return Resistance;
         }
 
         public string getHeartBeat()
