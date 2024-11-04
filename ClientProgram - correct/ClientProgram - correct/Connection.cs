@@ -40,13 +40,14 @@ namespace ClientProgram___correct
             errorCode = await bleHeart.OpenDevice("Decathlon Dual HR");
 
             // __TODO__ Error check
-
+                
             var services = bleBike.GetServices;
             foreach (var service in services)
             {
-                //Console.WriteLine($"Service: {service.Name}");
+                Console.WriteLine($"Service: {service.Name}");
             }
 
+            Thread.Sleep(1000);
             // Set service
             errorCode = await bleBike.SetService("6e40fec1-b5a3-f393-e0a9-e50e24dcca9e");
             await bleHeart.SetService("HeartRate");
@@ -92,7 +93,7 @@ namespace ClientProgram___correct
                     //Console.WriteLine("Snelheid: " + GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2)) + " Km/h");
                     //Console.WriteLine("Tijd: " + GetDuration("ab" + " S"));
 
-                    Speed = filter.Substring(24, 2) + filter.Substring(27, 2);
+                    Speed = filter.Substring(27, 2) + filter.Substring(24, 2);
                     //double Speed = GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2));
                     //Console.WriteLine(Speed);
                     Duration = filter.Substring(18, 2);

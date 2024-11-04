@@ -14,7 +14,7 @@ namespace FietsDemo
     public class Program
     {
         static int ID;
-        static IBike sim;
+        static IBike connection;
         static StreamWriter writer;
         static Stream stm;
         //static DataProtocol dataProtocol;
@@ -35,7 +35,7 @@ namespace FietsDemo
             //    Thread.Sleep(500);
             //    //Console.WriteLine();   
             //}
-            sim = new Connection();
+            connection = new Connection();
             //dataProtocol = new  DataProtocol(sim); 
             sendData = true;
             await VRConnection.Start();
@@ -100,14 +100,14 @@ namespace FietsDemo
                   
                     Data data = new Data(ID, 15, 16, 10, 76, 8,UserName);
 
-                    string input = sim.getSpeed();
+                    string input = connection.getSpeed();
                     data.Speed = Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2));
                     //Console.WriteLine(data.Speed);
-                    data.Distance = Calculations.GetDistance(sim.getDistance());
+                    data.Distance = Calculations.GetDistance(connection.getDistance());
                     //Console.WriteLine(data.Distance);
-                    data.Time = Calculations.GetDuration(sim.getDuration());
+                    data.Time = Calculations.GetDuration(connection.getDuration());
                     //Console.WriteLine(data.Time);
-                    data.HeartBeat = Calculations.getHeartBeat(sim.getHeartBeat());
+                    data.HeartBeat = Calculations.getHeartBeat(connection.getHeartBeat());
                     //Console.WriteLine(data.HeartBeat);
 
                     string jsonData = JsonConvert.SerializeObject(data);
@@ -163,7 +163,7 @@ namespace FietsDemo
                     else if (s.StartsWith("RESISTANCE"))
                     {
                         int Resistance = int.Parse(s.Split('|')[1]);
-                        sim.sendResistance(Resistance);
+                        connection.sendResistance(Resistance);
                     }
 
                 }

@@ -110,6 +110,8 @@ namespace ClientProgram___correct
 
             SetupRouteWithNode();
             await ReadResponse();
+
+            
         }
 
         private static async Task ReadResponse() 
@@ -554,6 +556,7 @@ namespace ClientProgram___correct
         {
             if (!emergenceStop) {
                 bikeSpeed = speed * 0.01;
+                Console.WriteLine(bikeSpeed);
                 updateBikeSpeed();
             }
         }
