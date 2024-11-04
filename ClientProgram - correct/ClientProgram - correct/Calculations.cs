@@ -27,7 +27,7 @@ namespace ClientProgram___correct
 
             int DecValue = Convert.ToInt32(TotalHexValue, 16);
             //Console.WriteLine(DecValue);
-            double SpeedInKmH = DecValue * 3.6 / 10;
+            double SpeedInKmH = DecValue * 3.6 / 1000;
             return SpeedInKmH;
         }
 

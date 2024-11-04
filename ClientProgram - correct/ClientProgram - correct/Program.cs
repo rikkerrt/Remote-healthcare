@@ -6,11 +6,6 @@ using System.Text;
 using System.Net.Sockets;
 using Newtonsoft.Json;
 using ClientProgram___correct;
-using ClientProgram;
-using ClientProgram___correct;
-using Newtonsoft.Json.Linq;
-using System.Security.Cryptography;
-using System.Web;
 using System.Threading.Tasks;
 
 namespace FietsDemo
@@ -45,7 +40,8 @@ namespace FietsDemo
             //}
             connection = new Connection();
             //dataProtocol = new  DataProtocol(sim); 
-            sendData = true;
+            sendData = false;
+            //Console.WriteLine("vr");
             await VRConnection.Start();
 
             //while (true)
@@ -119,7 +115,7 @@ namespace FietsDemo
                     string input = connection.getSpeed();
                     data.Speed = Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2));
                     data.Name = UserName;
-                    data.Resistance = sim.getResistance();
+                    data.Resistance = connection.getResistance();
                     //Console.WriteLine(data.Speed);
                     data.Distance = Calculations.GetDistance(connection.getDistance());
                     //Console.WriteLine(data.Distance);

@@ -45,6 +45,7 @@ namespace ClientProgram___correct
 
             createData();
             await ReadResponse();
+            //Console.WriteLine("read");
 
             id = getID(dataString);
 
@@ -618,7 +619,7 @@ namespace ClientProgram___correct
         public static void setSpeed(double speed) 
         {
             if (!emergenceStop) {
-                bikeSpeed = speed * 0.01;
+                bikeSpeed = speed;
                 //Console.WriteLine(bikeSpeed.ToString("F"));
                 updateBikeSpeed();
             }
