@@ -20,6 +20,21 @@ namespace ServerProgram___correct
             LoadDataFromFile(); 
         }
 
+        public int getHighestID()
+        {
+            int highestKey =0;
+            if (dataPerBike.Count > 0)
+            {
+                highestKey = dataPerBike.Keys.Max();
+            }
+            else
+            {
+                Console.WriteLine("The dictionary is empty.");
+            }
+
+            return highestKey;
+        }
+
         public void AddData(int bikeId, Data data)
         {
             if (!dataPerBike.ContainsKey(bikeId))

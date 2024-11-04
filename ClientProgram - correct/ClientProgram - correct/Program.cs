@@ -68,7 +68,7 @@ namespace FietsDemo
                 stm = tcpclnt.GetStream();
                 ASCIIEncoding asen = new ASCIIEncoding();
 
-                stm.Write(asen.GetBytes("f"), 0, asen.GetBytes("f").Length);
+                stm.Write(asen.GetBytes("f|"+UserName), 0, asen.GetBytes("f|"+UserName).Length);
                 byte[] buffer = new byte[100];
                 //int bytesRead = stm.Read(buffer, 0, buffer.Length);
                 //String Respons = Encoding.ASCII.GetString(buffer, 0, bytesRead);
@@ -104,7 +104,7 @@ namespace FietsDemo
                     if (sendData)
                     {
                   
-                    Data data = new Data(ID, 15, 16, 10, 76, 8);
+                    Data data = new Data(ID, 15, 16, 10, 76, 8,UserName);
 
                     string input = sim.getSpeed();
                     data.Speed = Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2));
@@ -187,8 +187,9 @@ namespace FietsDemo
             private int time;
             private int heartBeat;
             private int resistance;
+            private string name;
 
-            public Data(int id, double speed, double distance, int time, int heartBeat, int resistance)
+            public Data(int id, double speed, double distance, int time, int heartBeat, int resistance, string name)
             {
                 this.ID = id;
                 this.Speed = speed;
@@ -196,6 +197,7 @@ namespace FietsDemo
                 this.Time = time;
                 this.HeartBeat = heartBeat;
                 this.Resistance = resistance;
+                this.name = name;
             }
 
             public int ID { get; set; }
@@ -204,6 +206,7 @@ namespace FietsDemo
             public int Time { get; set; }
             public int HeartBeat { get; set; }
             public int Resistance { get; set; }
+            public string Name { get; set; }
 
             public override string ToString()
             {

@@ -8,8 +8,9 @@ using System;
 
 public class server
 {
-    static int i = 0;
+    static int BikeID = 0;
     public static Dictionary<int, Socket> bikeClients = new Dictionary<int, Socket>();
+    public static Dictionary<string, Socket> bikeClients1 = new Dictionary<string, Socket>();
     public static DoctorHandler doctorHandler;
     public static List<BikeHandler> bikeHandlers = new List<BikeHandler>();
     private static DataStorage DataStorage;
@@ -19,9 +20,12 @@ public class server
         try
         {
             DataStorage = new DataStorage("data.json");
+            BikeID = DataStorage.getHighestID();
 
 
-            Data data = new Data(10, 1.1, 2.2, 10, 3, 8);
+
+
+            Data data = new Data(10, 1.1, 2.2, 10, 3, 8, "name");
             TcpListener myList = new TcpListener(IPAddress.Any, 8001);
             myList.Start();
             Console.WriteLine("The server is running at port 8001...");
@@ -55,7 +59,7 @@ public class server
 
         if (s.StartsWith("f"))
         {
-            HandleBike(socket);
+            HandleBike(socket,s);
         }
         else if (s.StartsWith("d"))
         {
@@ -68,11 +72,12 @@ public class server
         socket.Close();
     }
 
-    public static void HandleBike(Socket socket)
+    public static void HandleBike(Socket socket, string message)
     {
-        i++;
-        bikeClients.Add(i, socket);
-        Console.WriteLine("Fiets-client verbonden met ID: " + i);
+        string name = (message.Split('|')[1]);
+        BikeID++;
+        bikeClients1.Add(BikeID+""+name, socket);
+        Console.WriteLine("Fiets-client verbonden met ID: " + BikeID);
 
         if (doctorHandler != null)
         {
@@ -80,7 +85,7 @@ public class server
         }
 
 
-        BikeHandler bikeHandler = new BikeHandler(socket, i, DataStorage);
+        BikeHandler bikeHandler = new BikeHandler(socket, BikeID, DataStorage);
         if (doctorHandler != null)
         {
             bikeHandler.SetDoctorHandler(doctorHandler);
@@ -93,7 +98,7 @@ public class server
         }
         bikeHandler.HandleBike();
 
-        bikeClients.Remove(i);
+        bikeClients.Remove(BikeID);
     }
 
     public static void HandleDoctor(Socket socket)
@@ -126,8 +131,9 @@ public class Data
     private int time;
     private int heartBeat;
     private int resistance;
+    private string name;
 
-    public Data(int id, double speed, double distance, int time, int heartBeat, int resistance)
+    public Data(int id, double speed, double distance, int time, int heartBeat, int resistance, string name)
     {
         this.ID = id;
         this.Speed = speed;
@@ -135,6 +141,7 @@ public class Data
         this.Time = time;
         this.HeartBeat = heartBeat;
         this.Resistance = resistance;
+        this.name = name;
     }
 
     public int ID { get; set; }
@@ -143,6 +150,7 @@ public class Data
     public int Time { get; set; }
     public int HeartBeat { get; set; }
     public int Resistance { get; set; }
+    public string Name { get; set; }
 
     public override string ToString()
     {

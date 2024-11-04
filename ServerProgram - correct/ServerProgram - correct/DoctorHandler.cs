@@ -170,17 +170,18 @@ namespace ServerProgram___correct
         public void SendBikeClientList()
         {
             List<int> bikeData = new List<int>();
+            List<string> bikeData1 = new List<string>();
 
-            foreach (var bikeClient in server.bikeClients)
+            foreach (var bikeClient in server.bikeClients1)
             {
-                int bikeId = bikeClient.Key;
-                bikeData.Add(bikeId);
+                string bikeId = bikeClient.Key;
+                bikeData1.Add(bikeId);
             }
 
 
             ASCIIEncoding asen = new ASCIIEncoding();
 
-            string bikeDataString = "bikeclients|"+JsonConvert.SerializeObject(bikeData);
+            string bikeDataString = "bikeclients|"+JsonConvert.SerializeObject(bikeData1);
 
             byte[] messageBytes = asen.GetBytes(bikeDataString);
             Socket.Send(messageBytes); 

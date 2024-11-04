@@ -22,6 +22,7 @@ namespace ServerProgram___correct
             Socket = socket;
             BikeId = bikeId;
             DataStorage = dataStorage;
+            Console.WriteLine(DataStorage.getHighestID());
 
         }
 
