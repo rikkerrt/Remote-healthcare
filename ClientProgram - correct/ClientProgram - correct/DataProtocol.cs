@@ -27,7 +27,6 @@ namespace ClientProgram___correct
                 { 
                     Console.WriteLine("resistence not a number so has been set to 10");   
                 }
-
                 iBike.sendResistance(resistance);
             }
             else

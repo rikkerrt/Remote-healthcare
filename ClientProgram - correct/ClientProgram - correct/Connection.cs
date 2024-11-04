@@ -13,7 +13,6 @@ namespace ClientProgram___correct
         private static string HeartBeat = "00";
         private static BLE bleBike;
 
-
         public Connection() 
         { 
             Thread connection = new Thread(new ThreadStart(run));
@@ -29,11 +28,6 @@ namespace ClientProgram___correct
 
             // List available devices
             List<String> bleBikeList = bleBike.ListDevices();
-            //Console.WriteLine("Devices found: ");
-            //foreach (var name in bleBikeList)
-            //{
-            //    Console.WriteLine($"Device: {name}");
-            //}
 
             // Connecting
             errorCode = errorCode = await bleBike.OpenDevice("Tacx Flux 01249");
@@ -65,49 +59,19 @@ namespace ClientProgram___correct
 
         private void BleBike_SubscriptionValueChanged(object sender, BLESubscriptionValueChangedEventArgs e)
         {
-            //Console.WriteLine("ontvangen");
-            //Console.WriteLine("Received from {0}: {1}, {2}", e.ServiceName,
-            //    BitConverter.ToString(e.Data).Replace("-", " "),
-            //Encoding.UTF8.GetString(e.Data));
-
             String filter = BitConverter.ToString(e.Data).Replace("-", " ");
             Console.WriteLine("new reading got");
 
             if (filter.Substring(0, 2).Equals("16"))
             {
-                //Console.WriteLine(filter + "\n");
-            }
+                HeartBeat = filter.Substring(3,2);            }
             else
             {
-                if (filter.Substring(12, 2).Equals("10"))
+                if (filter.Substring(0,2).Equals("A4") && filter.Substring(12, 2).Equals("10"))
                 {
-                    //if (FirstRun)
-                    //{
-                    //    Console.WriteLine("Je bent in de IF");
-                    //    DurationDeviation = GetDuration(filter.Substring(18, 2));
-                    //    DistanceDeviation = GetDistance(filter.Substring(21, 2));
-                    //    FirstRun = false;
-                    //}
-
-                    //Console.WriteLine("Afstand: " + GetDistance("aa"));
-                    //Console.WriteLine("Snelheid: " + GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2)) + " Km/h");
-                    //Console.WriteLine("Tijd: " + GetDuration("ab" + " S"));
-
                     Speed = filter.Substring(27, 2) + filter.Substring(24, 2);
-                    //double Speed = GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2));
-                    //Console.WriteLine(Speed);
                     Duration = filter.Substring(18, 2);
-                    //double Duration = GetDuration(filter.Substring(18, 2)) - DurationDeviation;
                     Distance = filter.Substring(21, 2);
-                    //double Distance = GetDistance(filter.Substring(21, 2)) - DistanceDeviation;
-
-                    //Console.WriteLine("Tijdsduur: " + Duration);
-                    //Console.WriteLine("Afstand: " + Distance);
-                    //Console.WriteLine("Snelheid: " + Speed + "\n");
-                }
-                else
-                {
-                    //Console.WriteLine(filter + "\n");
                 }
             }
         }
@@ -128,7 +92,6 @@ namespace ClientProgram___correct
                 data = (byte)resistance;
             }
 
-
             byte[] bytes = { 0xA4, 0x09, 0x4E, 0x05, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, data };  //laatste veranderen 
 
             byte checkSum = 0x00;
@@ -147,7 +110,6 @@ namespace ClientProgram___correct
 
         public static void sendResistance(BLE bleBike)
         {
-
             byte[] bytes = { 0xA4, 0x09, 0x4E, 0x05, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };  //laatste veranderen 
 
             byte checkSum = 0x00;
@@ -161,19 +123,17 @@ namespace ClientProgram___correct
             toSend[toSend.Length - 1] = checkSum;
 
             bleBike.WriteCharacteristic("6e40fec3-b5a3-f393-e0a9-e50e24dcca9e", toSend);
-            //Console.WriteLine("done");
         }
 
         private static int HexToDecimal(string hexValue)
         {
             int decValue = int.Parse(hexValue, System.Globalization.NumberStyles.HexNumber);
             return decValue;
-
         }
 
         public string getSpeed()
         {
-            return Connection.Speed;
+            return Speed;
         }
 
         public string getDistance()
@@ -188,7 +148,7 @@ namespace ClientProgram___correct
 
         public string getHeartBeat()
         {
-            return Connection.HeartBeat;
+            return HeartBeat;
         }
     }
 }

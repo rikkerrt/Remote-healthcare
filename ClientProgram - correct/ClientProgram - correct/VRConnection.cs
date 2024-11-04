@@ -17,6 +17,8 @@ namespace ClientProgram___correct
         private static string encoded = "";
         private static string send;
         private static string dataString;
+        private static byte[] dataBuffer;
+        private static byte[] length;
 
         private static string id;
         private static string tunnelId;
@@ -99,6 +101,14 @@ namespace ClientProgram___correct
             hudID = getUUIDstring(dataString);
             //Console.WriteLine("Hud ID: " + hudID);
 
+            await updatePanel();
+
+            SetupRouteWithNode();
+            await ReadResponse();
+
+            
+        }
+        public static async Task updatePanel() {
             clearPanel();
             await ReadResponse();
 
@@ -107,16 +117,11 @@ namespace ClientProgram___correct
 
             swapBuffers();
             await ReadResponse();
-
-            SetupRouteWithNode();
-            await ReadResponse();
-
-            
         }
 
         private static async Task ReadResponse() 
         {
-            byte[] length = new byte[4];
+            length = new byte[4];
             int PrependLenght = 0;
 
             while (PrependLenght < 4) 
@@ -127,7 +132,9 @@ namespace ClientProgram___correct
 
             int lengthInt = BitConverter.ToInt32(length, 0);
             //Console.WriteLine(lengthInt);
-            byte[] dataBuffer = new byte[lengthInt];
+           
+                dataBuffer = new byte[lengthInt];
+           
 
             int readTotal = 0;
             do
@@ -372,7 +379,9 @@ namespace ClientProgram___correct
             };
 
             SendTunnelCommand("route/follow/speed", speedUpdate);
+            await updatePanel();
             await ReadResponse();
+
         }   
         
         /*private static void addBikeNodeToMap()
