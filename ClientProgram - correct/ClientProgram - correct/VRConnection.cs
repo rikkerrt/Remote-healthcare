@@ -423,13 +423,11 @@ namespace ClientProgram___correct {
             var routeData = new
             {
                 nodes = new[] {
-                        new { pos = new[] { -100, 0, 100 }, dir = new[] { 20, 0, -40 } },
-                        new { pos = new[] { -20, 0, 40 }, dir = new[] { 50, 0, -10 } },
-                        new { pos = new[] { 40, 0, 50 }, dir = new[] { 40, 0, -60 } },
-                        new { pos = new[] { 100, 0, -10 }, dir = new[] { -20, 0, -50 } },
-                        new { pos = new[] { 60, 0, -70 }, dir = new[] { -40, 0, -30 } },
-                        new { pos = new[] { 10, 0, -100 }, dir = new[] { -30, 0, 20 } },
-                        new { pos = new[] { -100, 0, 100 }, dir = new[] { 0, 0, 0 } },
+                        new { pos = new[] { 0, 0, 0 }, dir = new[] { 90, 0, -20 } },
+                        new { pos = new[] { -50, 0, -50 }, dir = new[] { -100, 0, -50 } },
+                        new { pos = new[] { 100, 0, -90 }, dir = new[] { 90, 0, 75 } },
+                        new { pos = new[] { -80, 0, 100 }, dir = new[] { -100, 0, -100 } },
+                        
                 }
             };
             SendTunnelCommand("route/add",routeData);
