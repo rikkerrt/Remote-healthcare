@@ -1,14 +1,11 @@
 using ClientProgram___correct;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace ClientProgram {
-    class Simulation : IBike {
+namespace ClientProgram 
+{
+    class Simulation : IBike 
+    {
 
         private int Mode;
         private string Speed = "00";
@@ -54,7 +51,8 @@ namespace ClientProgram {
             }
         }
 
-        public void ModeOne() {
+        public void ModeOne()
+        {
             Speed = "B55C";
             Distance = "11";
             Duration++;

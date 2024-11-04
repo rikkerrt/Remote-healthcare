@@ -1,24 +1,17 @@
-using Microsoft.SqlServer.Server;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
-using System.Security.Policy;
-using System.Security.Principal;
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
-namespace ClientProgram___correct {
-    internal class VRConnection {
+namespace ClientProgram___correct 
+{
+    internal class VRConnection 
+    {
         private static TcpClient client = new TcpClient();
         private static string _address = "85.145.62.130";
         private static string encoded = "";
@@ -43,7 +36,8 @@ namespace ClientProgram___correct {
         public static byte[] data;
 
 
-        public static async Task Start() {
+        public static async Task Start() 
+        {
             client.Connect(_address, 6666);
             networkStream = client.GetStream();
 
@@ -118,11 +112,13 @@ namespace ClientProgram___correct {
             await ReadResponse();
         }
 
-        private static async Task ReadResponse() {
+        private static async Task ReadResponse() 
+        {
             byte[] length = new byte[4];
             int PrependLenght = 0;
 
-            while (PrependLenght < 4) {
+            while (PrependLenght < 4) 
+            {
                 int dataPrependRead = await networkStream.ReadAsync(length, 0, length.Length);
                 PrependLenght += dataPrependRead;
             }
@@ -132,7 +128,8 @@ namespace ClientProgram___correct {
             byte[] dataBuffer = new byte[lengthInt];
 
             int readTotal = 0;
-            do {
+            do
+            {
                 int read = await networkStream.ReadAsync(dataBuffer, readTotal, dataBuffer.Length - readTotal);
                 readTotal += read;
                 //Console.WriteLine(readTotal);
@@ -164,7 +161,8 @@ namespace ClientProgram___correct {
             //Console.WriteLine("vrconnection done");
         }
 
-        public static void SendPacket(byte[] prepend, byte[] data) {
+        public static void SendPacket(byte[] prepend, byte[] data) 
+        {
             byte[] combinedArray = new byte[prepend.Length + data.Length];
             Array.Copy(prepend, 0, combinedArray, 0, prepend.Length);
             Array.Copy(data, 0, combinedArray, prepend.Length, data.Length);
@@ -172,15 +170,18 @@ namespace ClientProgram___correct {
             //Console.WriteLine("Command send: " + Encoding.UTF8.GetString(combinedArray));
         }
 
-        public static void createData() {
+        public static void createData() 
+        {
             string jsonPacket = "{\"id\" : \"session/list\"}";
             data = Encoding.ASCII.GetBytes(jsonPacket);
             prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
             SendPacket(prepend, data);
         }
 
-        public static void createTunnel(string id) {
-            var tunnelCommand = new {
+        public static void createTunnel(string id) 
+        {
+            var tunnelCommand = new 
+            {
                 id = "tunnel/create",
                 data = new {
                     session = id,
@@ -194,8 +195,10 @@ namespace ClientProgram___correct {
             SendPacket(prepend, data);
         }
 
-        public static void clearScene() {
-            var clearData = new {
+        public static void clearScene() 
+        {
+            var clearData = new 
+            {
 
             };
 
@@ -233,7 +236,8 @@ namespace ClientProgram___correct {
             SendPacket(prepend, data);
         }
 
-        private static void generateTerrain() {
+        private static void generateTerrain() 
+        {
             int width = 256;
             int height = 256;
             float[,] heights = new float[width, height];
@@ -257,15 +261,19 @@ namespace ClientProgram___correct {
         private static void addNodeToTerrain()
         {
 
-            var nodeData = new {
+            var nodeData = new 
+            {
                 name = "terrain",
-                components = new {
-                    transform = new {
+                components = new 
+                {
+                    transform = new 
+                    {
                         position = new[] { -128, 0, -128 },
                         scale = 1,
                         rotation = new[] { 0, 0, 0 },
                     },
-                    terrain = new {
+                    terrain = new 
+                    {
                         smooth = true,
                     }
                 }
@@ -353,8 +361,10 @@ namespace ClientProgram___correct {
             SendTunnelCommand("scene/panel/drawtext", speedToHud);
         }
 
-        private async static void updateBikeSpeed() {
-            var speedUpdate = new {
+        private async static void updateBikeSpeed() 
+        {
+            var speedUpdate = new 
+            {
                 node = cameraIDstring,
                 speed = bikeSpeed,
             };
@@ -453,7 +463,8 @@ namespace ClientProgram___correct {
             SendTunnelCommand("scene/road/add",addRoadData);
         }
         
-        public static string getTunnelId(string tunnelDataString) {
+        public static string getTunnelId(string tunnelDataString) 
+        {
             string tunnelId = "";
             JsonNode jsonNode = JsonNode.Parse(tunnelDataString);
             JsonObject jsonObject = jsonNode.AsObject();
@@ -502,7 +513,8 @@ namespace ClientProgram___correct {
             foreach (Data data1 in dataObject) {
                 if (data1.features.Contains("tunnel")) {
                     ClientInfo info = data1.clientinfo;
-                    if (info.host.ToLower() == Dns.GetHostName().ToLower()) {
+                    if (info.host.ToLower() == Dns.GetHostName().ToLower()) 
+                    {
                         Console.WriteLine(data1.id);
                         idHost = data1.id;
                     }
@@ -546,7 +558,8 @@ namespace ClientProgram___correct {
             }
         }
 
-        public static void setEmergencyStop(bool stop) {
+        public static void setEmergencyStop(bool stop) 
+        {
             bikeSpeed = 0;
             updateBikeSpeed();
             emergenceStop = stop;
@@ -586,10 +599,12 @@ namespace ClientProgram___correct {
 
     }
 
-    internal class JsonData {
+    internal class JsonData 
+    {
         public List<Data> data { get; set; }
         public string id { get; set; }
-        public JsonData(string id, List<Data> data) {
+        public JsonData(string id, List<Data> data)
+        {
             this.data = data;
             this.id = id;
         }

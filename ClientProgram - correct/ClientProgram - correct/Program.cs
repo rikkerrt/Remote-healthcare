@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 using ClientProgram___correct;
 using ClientProgram;
 using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
 
 namespace FietsDemo
 {

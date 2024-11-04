@@ -1,10 +1,7 @@
 ﻿using Avans.TI.BLE;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ClientProgram___correct
 {
@@ -16,7 +13,8 @@ namespace ClientProgram___correct
         private static string HeartBeat = "00";
 
 
-        public Connection() { 
+        public Connection() 
+        { 
             Thread connection = new Thread(new ThreadStart(run));
             connection.Start();
         }
