@@ -52,14 +52,14 @@ namespace ClientProgram___correct
             await ReadResponse();
 
             tunnelId = getTunnelId(dataString);
-            Console.WriteLine(tunnelId);
+            //Console.WriteLine(tunnelId);
 
             clearScene();
             await ReadResponse();
 
             generateTerrain();
             await ReadResponse();
-            Console.WriteLine(dataString);
+            //Console.WriteLine(dataString);
 
             addNodeToTerrain();
             await ReadResponse();
@@ -225,6 +225,7 @@ namespace ClientProgram___correct
 
             SendTunnelCommand("scene/reset", clearData);
         }
+
         //
         // Methode om de cameraNode te vinden. Hiermee kunnen wij koppelingen maken met de overige onderdelen.
         //
@@ -236,6 +237,7 @@ namespace ClientProgram___correct
             };
             SendTunnelCommand("scene/node/find", cameraNodeCommand);
         }
+
         //
         // Deze methode zorgt voor de juiste verdeling van de commando's het Json pakket wordt zo juist ingeladen en het commando komt ook afzonderlijk binnen.
         //
@@ -261,6 +263,7 @@ namespace ClientProgram___correct
             byte[] prepend = BitConverter.GetBytes(data.Length);
             SendPacket(prepend, data);
         }
+
         //
         // Methode voor het aanmaken van het terrein. Deze methode maakt ook heuvels voor oneven terrein.
         //
@@ -387,7 +390,7 @@ namespace ClientProgram___correct
             var speedToHud = new
             {
                 id = hudID,
-                text = bikeSpeed.ToString() + " km/h",
+                text = bikeSpeed.ToString("#.##") + " km/h",
                 position = new[] {75.0,75.0},
                 size = 50.0,
                 color = new[] { 1, 1, 1, 1 },
@@ -616,7 +619,7 @@ namespace ClientProgram___correct
         {
             if (!emergenceStop) {
                 bikeSpeed = speed * 0.01;
-                Console.WriteLine(bikeSpeed);
+                //Console.WriteLine(bikeSpeed.ToString("F"));
                 updateBikeSpeed();
             }
         }

@@ -108,7 +108,7 @@ namespace FietsDemo
                     data.Time = Calculations.GetDuration(connection.getDuration());
                     //Console.WriteLine(data.Time);
                     data.HeartBeat = Calculations.getHeartBeat(connection.getHeartBeat());
-                    Console.WriteLine("Heartbeat: " + data.HeartBeat);
+                    //Console.WriteLine("Heartbeat: " + data.HeartBeat);
 
                         string jsonData = JsonConvert.SerializeObject(data);
                     writer.WriteLine(jsonData);

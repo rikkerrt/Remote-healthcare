@@ -36,12 +36,12 @@ namespace ClientProgram___correct
             // __TODO__ Error check
                 
             var services = bleBike.GetServices;
-            foreach (var service in services)
-            {
-                Console.WriteLine($"Service: {service.Name}");
-            }
+            //foreach (var service in services)
+            //{
+            //    Console.WriteLine($"Service: {service.Name}");
+            //}
 
-            Thread.Sleep(1000);
+            Thread.Sleep(100);
             // Set service
             errorCode = await bleBike.SetService("6e40fec1-b5a3-f393-e0a9-e50e24dcca9e");
             await bleHeart.SetService("HeartRate");
@@ -49,7 +49,7 @@ namespace ClientProgram___correct
 
             // Subscribe
             bleBike.SubscriptionValueChanged += BleBike_SubscriptionValueChanged;
-            Console.WriteLine("bike connecion succesfull");
+            //Console.WriteLine("bike connecion succesfull");
             bleHeart.SubscriptionValueChanged += BleBike_SubscriptionValueChanged;
             errorCode = await bleBike.SubscribeToCharacteristic("6e40fec2-b5a3-f393-e0a9-e50e24dcca9e");
             await bleHeart.SubscribeToCharacteristic("HeartRate");
@@ -60,7 +60,7 @@ namespace ClientProgram___correct
         private void BleBike_SubscriptionValueChanged(object sender, BLESubscriptionValueChangedEventArgs e)
         {
             String filter = BitConverter.ToString(e.Data).Replace("-", " ");
-            Console.WriteLine("new reading got");
+            //Console.WriteLine("new reading got");
 
             if (filter.Substring(0, 2).Equals("16"))
             {
