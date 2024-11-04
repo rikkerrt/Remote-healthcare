@@ -41,7 +41,7 @@ namespace ServerProgram___correct
             {
                 try
                 {
-                    byte[] buffer = new byte[1024];
+                    byte[] buffer = new byte[10024];
                     int receivedBytes = Socket.Receive(buffer);
 
                     if (receivedBytes == 0)
@@ -51,7 +51,7 @@ namespace ServerProgram___correct
                     }
 
 
-                    string jsonData = Encoding.ASCII.GetString(buffer, 0, receivedBytes).Trim();
+                    string jsonData = Encoding.ASCII.GetString(buffer, 0, receivedBytes);
 
                     Data data = JsonConvert.DeserializeObject<Data>(jsonData);
 

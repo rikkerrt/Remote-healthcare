@@ -33,6 +33,7 @@ namespace FietsDemo
 
             Console.Write("Wat is je naam? ");
             UserName = Console.ReadLine();
+            Console.WriteLine("je username ="+UserName);
 
             //IBike sim = new Simulation(3);
             //while (true)
@@ -44,7 +45,7 @@ namespace FietsDemo
             //}
             sim = new Simulation(3);
             //dataProtocol = new  DataProtocol(sim); 
-            sendData = true;
+            sendData = false;
 
 
             //while (true)
@@ -103,6 +104,7 @@ namespace FietsDemo
                 {
                     if (sendData)
                     {
+                    Console.WriteLine(UserName);
                   
                     Data data = new Data(ID, 15, 16, 10, 76, 8,UserName);
 
@@ -115,6 +117,8 @@ namespace FietsDemo
                     Console.WriteLine(data.Time);
                     data.HeartBeat = Calculations.getHeartBeat(sim.getHeartBeat());
                     Console.WriteLine(data.HeartBeat);
+                    data.Name = UserName;
+                    
 
                     string jsonData = JsonConvert.SerializeObject(data);
                     writer.WriteLine(jsonData);
@@ -143,7 +147,7 @@ namespace FietsDemo
                     string s = System.Text.Encoding.ASCII.GetString(b);
                     if (s.StartsWith("sendData"))
                     {
-                        string send = (s.Split(' ')[1]);
+                        string send = (s.Split('|')[1]);
                         if (s.Contains("true"))
                         {
                             sendData = true;

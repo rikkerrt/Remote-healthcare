@@ -29,7 +29,7 @@ namespace ServerProgram___correct
             }
             else
             {
-                Console.WriteLine("The dictionary is empty.");
+                highestKey = 0;
             }
 
             return highestKey;
@@ -43,6 +43,8 @@ namespace ServerProgram___correct
             }
 
             dataPerBike[bikeId].Add(data);
+
+            Console.WriteLine("Dit dataobject is toegevoegd: "+data.ToString()+"aan ID: "+bikeId);
         }
 
         public List<Data> GetData(int bikeId)

@@ -76,7 +76,7 @@ public class server
     {
         string name = (message.Split('|')[1]);
         BikeID++;
-        bikeClients1.Add(BikeID+""+name, socket);
+        bikeClients1.Add(BikeID+": "+name, socket);
         Console.WriteLine("Fiets-client verbonden met ID: " + BikeID);
 
         if (doctorHandler != null)

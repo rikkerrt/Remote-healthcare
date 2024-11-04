@@ -29,9 +29,8 @@ namespace ServerProgram___correct
         public void HandleDoctor()
         {
             ASCIIEncoding asen = new ASCIIEncoding();
-            Socket.Send(asen.GetBytes(Socket.ToString()));
-            SendBikeClientList();
-            Socket.Send(asen.GetBytes("WW|true"));
+            //Socket.Send(asen.GetBytes(Socket.ToString()));
+            //SendBikeClientList();
 
 
             while (true)
@@ -39,7 +38,7 @@ namespace ServerProgram___correct
                 try
                 {
 
-                    byte[] b = new byte[1024];
+                    byte[] b = new byte[10024];
                     int k = Socket.Receive(b);
                     Console.WriteLine("Recieved...");
 
@@ -50,10 +49,12 @@ namespace ServerProgram___correct
                     if (s.StartsWith("WW"))
                     {
                         string PassWord = (s.Split('|')[1]);
+                        Console.WriteLine(PassWord);
 
                         if (PassWord.Equals(RightPassword))
                         {
                             byte[] messageBytes = asen.GetBytes("WW|true");
+                           
                             Socket.Send(messageBytes);
                         }
                         else
@@ -96,7 +97,7 @@ namespace ServerProgram___correct
                         int id = int.Parse(s.Split(' ')[1]);
                         Console.WriteLine("Stop sessie voor client met ID: " + id);
 
-                        SendMessageToClient(id, "sendData| false");
+                        SendMessageToClient(id, "sendData|false");
                     }
                     
                     if (s.StartsWith("RESISTANCE"))

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DokterProgram -  correct", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerProgram - correct", "..\ServerProgram - correct\ServerProgram - correct\ServerProgram - correct.csproj", "{D4744828-EFB5-44A9-903A-67AEA39E84EF}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoctorClient", "..\DoctorClientV1\DoctorClient\DoctorClient.csproj", "{2679499B-AF4F-4630-9FD3-7AE51541F0F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D4744828-EFB5-44A9-903A-67AEA39E84EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4744828-EFB5-44A9-903A-67AEA39E84EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4744828-EFB5-44A9-903A-67AEA39E84EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2679499B-AF4F-4630-9FD3-7AE51541F0F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2679499B-AF4F-4630-9FD3-7AE51541F0F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2679499B-AF4F-4630-9FD3-7AE51541F0F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2679499B-AF4F-4630-9FD3-7AE51541F0F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
