@@ -17,6 +17,8 @@ namespace ClientProgram___correct
         private static string encoded = "";
         private static string send;
         private static string dataString;
+        private static byte[] dataBuffer;
+        private static byte[] length;
 
         private static string id;
         private static string tunnelId;
@@ -50,20 +52,20 @@ namespace ClientProgram___correct
             await ReadResponse();
 
             tunnelId = getTunnelId(dataString);
-            Console.WriteLine(tunnelId);
+            //Console.WriteLine(tunnelId);
 
             clearScene();
             await ReadResponse();
 
             generateTerrain();
             await ReadResponse();
-            Console.WriteLine(dataString);
+            //Console.WriteLine(dataString);
 
             addNodeToTerrain();
             await ReadResponse();
 
             uuIDstring = getUUIDstring(dataString);
-            Console.WriteLine("De string van de textures " + uuIDstring);
+            //Console.WriteLine("De string van de textures " + uuIDstring);
 
             addLayerToNode(uuIDstring);
             await ReadResponse();
@@ -72,7 +74,7 @@ namespace ClientProgram___correct
             await ReadResponse();
 
             routeID = getRouteID(dataString);
-            Console.WriteLine("Route ID " + routeID);
+            //Console.WriteLine("Route ID " + routeID);
 
             showRouteOnMap();
             await ReadResponse();
@@ -88,7 +90,7 @@ namespace ClientProgram___correct
             await ReadResponse();
 
             cameraIDstring = getUtillID(dataString);
-            Console.WriteLine("Camera ID " + cameraIDstring);
+            //Console.WriteLine("Camera ID " + cameraIDstring);
 
             addBikeNode();
             await ReadResponse();
@@ -97,8 +99,16 @@ namespace ClientProgram___correct
             await ReadResponse();
 
             hudID = getUUIDstring(dataString);
-            Console.WriteLine("Hud ID: " + hudID);
+            //Console.WriteLine("Hud ID: " + hudID);
 
+            await updatePanel();
+
+            SetupRouteWithNode();
+            await ReadResponse();
+
+            
+        }
+        public static async Task updatePanel() {
             clearPanel();
             await ReadResponse();
 
@@ -107,25 +117,25 @@ namespace ClientProgram___correct
 
             swapBuffers();
             await ReadResponse();
-
-            SetupRouteWithNode();
-            await ReadResponse();
         }
-
+        //
+        // Via deze methode wordt ieder binnenkomend bericht uitgelezen en verwerkt.
+        //
         private static async Task ReadResponse() 
         {
-            byte[] length = new byte[4];
+            length = new byte[4];
             int PrependLenght = 0;
-
-            while (PrependLenght < 4) 
+            do
             {
-                int dataPrependRead = await networkStream.ReadAsync(length, 0, length.Length);
+                int dataPrependRead = await networkStream.ReadAsync(length, 0, length.Length - PrependLenght);
                 PrependLenght += dataPrependRead;
-            }
-
+            } while (PrependLenght < 4); 
+            
             int lengthInt = BitConverter.ToInt32(length, 0);
             //Console.WriteLine(lengthInt);
-            byte[] dataBuffer = new byte[lengthInt];
+           
+            dataBuffer = new byte[lengthInt];
+           
 
             int readTotal = 0;
             do
@@ -136,7 +146,8 @@ namespace ClientProgram___correct
             } while (readTotal < dataBuffer.Length);
 
             dataString = Encoding.UTF8.GetString(dataBuffer, 0, readTotal);
-            Console.WriteLine("Response: " + Encoding.UTF8.GetString(dataBuffer, 0, readTotal) + "\n");
+           
+            //Console.WriteLine("Response: " + Encoding.UTF8.GetString(dataBuffer, 0, readTotal) + "\n");
 
             /*while (PrependLenght < lengthInt)
             {
@@ -161,6 +172,10 @@ namespace ClientProgram___correct
             //Console.WriteLine("vrconnection done");
         }
 
+
+        //
+        //  Via deze methode worden de te versturen bestanden klaargemaakt om door de tunnel te verzenden.
+        //
         public static void SendPacket(byte[] prepend, byte[] data) 
         {
             byte[] combinedArray = new byte[prepend.Length + data.Length];
@@ -169,7 +184,9 @@ namespace ClientProgram___correct
             networkStream.Write(combinedArray, 0, combinedArray.Length);
             //Console.WriteLine("Command send: " + Encoding.UTF8.GetString(combinedArray));
         }
-
+        //
+        // Deze methode zorgt voor een lijst met de sessie die beschikbaar zijn. Hiermee kunnen wij een connectie beginnen.
+        //
         public static void createData() 
         {
             string jsonPacket = "{\"id\" : \"session/list\"}";
@@ -177,7 +194,9 @@ namespace ClientProgram___correct
             prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
             SendPacket(prepend, data);
         }
-
+        //
+        // Deze methode zorgt voor een tunnel die de commando's voor de VR wereld sturen.
+        //
         public static void createTunnel(string id) 
         {
             var tunnelCommand = new 
@@ -194,7 +213,9 @@ namespace ClientProgram___correct
             byte[] prepend = BitConverter.GetBytes(data.Length);
             SendPacket(prepend, data);
         }
-
+        //
+        // Deze methode zorgt voor de eerste reset van de Scene van het hele terrein.
+        //
         public static void clearScene() 
         {
             var clearData = new 
@@ -204,6 +225,10 @@ namespace ClientProgram___correct
 
             SendTunnelCommand("scene/reset", clearData);
         }
+
+        //
+        // Methode om de cameraNode te vinden. Hiermee kunnen wij koppelingen maken met de overige onderdelen.
+        //
         private static void findCameraNode()
         {
             var cameraNodeCommand = new
@@ -213,6 +238,9 @@ namespace ClientProgram___correct
             SendTunnelCommand("scene/node/find", cameraNodeCommand);
         }
 
+        //
+        // Deze methode zorgt voor de juiste verdeling van de commando's het Json pakket wordt zo juist ingeladen en het commando komt ook afzonderlijk binnen.
+        //
         public static void SendTunnelCommand(string command, object jsonCommandData)
         {
             var alJsonData = new
@@ -236,6 +264,9 @@ namespace ClientProgram___correct
             SendPacket(prepend, data);
         }
 
+        //
+        // Methode voor het aanmaken van het terrein. Deze methode maakt ook heuvels voor oneven terrein.
+        //
         private static void generateTerrain() 
         {
             int width = 256;
@@ -257,7 +288,9 @@ namespace ClientProgram___correct
             };
             SendTunnelCommand("scene/terrain/add", terrainData);
         }
-
+        //
+        // Methode die aan de grond node de naam van het terrein toekent.
+        //
         private static void addNodeToTerrain()
         {
 
@@ -281,7 +314,9 @@ namespace ClientProgram___correct
 
             SendTunnelCommand("scene/node/add", nodeData);
         }
-
+        //
+        // Node voor het aanmaken voor het panel dat meerijdt met de gebruiker.
+        //
         private static void addHudNode()
         {
             var nodeData = new
@@ -308,6 +343,9 @@ namespace ClientProgram___correct
 
             SendTunnelCommand("scene/node/add", nodeData);
         }
+        //
+        // De fysieke node van de fiets, deze heeft een model van een fiets zodat het lijkt alsof deze daadwerkelijk rijd.
+        //
         private static void addBikeNode()
         {
             var bikeData = new
@@ -352,7 +390,7 @@ namespace ClientProgram___correct
             var speedToHud = new
             {
                 id = hudID,
-                text = bikeSpeed.ToString() + " km/h",
+                text = bikeSpeed.ToString("#.##") + " km/h",
                 position = new[] {75.0,75.0},
                 size = 50.0,
                 color = new[] { 1, 1, 1, 1 },
@@ -360,7 +398,10 @@ namespace ClientProgram___correct
             };
             SendTunnelCommand("scene/panel/drawtext", speedToHud);
         }
-
+        //
+        // Met deze methode kunnen wij de snelheid aanpassen van de fiets. Met de update panel worden bovenstaande methoden aangeroepen
+        // die het panel ook voorzien van de snelheid die dan up to date is.
+        //
         private async static void updateBikeSpeed() 
         {
             var speedUpdate = new 
@@ -370,7 +411,9 @@ namespace ClientProgram___correct
             };
 
             SendTunnelCommand("route/follow/speed", speedUpdate);
+            await updatePanel();
             await ReadResponse();
+
         }   
         
         /*private static void addBikeNodeToMap()
@@ -398,6 +441,10 @@ namespace ClientProgram___correct
 
             SendTunnelCommand("scene/node/add",nodeData);
         }*/
+
+        //
+        // Node die ervoor zorgt dat de route kan worden gevolgd met de nodes die hieraan worden toegekend.
+        //
         private static void SetupRouteWithNode()
         {
             var followData = new
@@ -414,6 +461,9 @@ namespace ClientProgram___correct
             };
             SendTunnelCommand("route/follow", followData);
         }
+        //
+        // Voorziet de terrein node van een laag met een foto erop. Dit zorgt voor de grassige ondergrond.
+        //
         private static void addLayerToNode(string uuid)
         {
 
@@ -428,6 +478,9 @@ namespace ClientProgram___correct
             };
             SendTunnelCommand("scene/node/addlayer", layerData);
         }
+        //
+        // De methode die een route aanmaakt voor de gebruiker om overheen te kunnen rijden.
+        //
         private static void addRouteToMap()
         {
             var routeData = new
@@ -442,6 +495,10 @@ namespace ClientProgram___correct
             };
             SendTunnelCommand("route/add",routeData);
         }
+
+        //
+        // Methode die vooral voor het debuggen gebruikt is. Hiermee is de route onder de map te zien.
+        //
         private static void showRouteOnMap()
         {
             var showRouteData = new
@@ -450,6 +507,9 @@ namespace ClientProgram___correct
             };
             SendTunnelCommand("route/show",showRouteData);
         }
+        //
+        // Voorziet de road die gemaakt is van een eigen texture. Hiermee krijgen we de weg die ook van asfalt gemaakt is.
+        //
         private static void addRoadTexture(string routeID)
         {
             var addRoadData = new
@@ -463,6 +523,11 @@ namespace ClientProgram___correct
             SendTunnelCommand("scene/road/add",addRoadData);
         }
         
+        //
+        // Onderstaande getters worden gebruikt voor verschillende ID elementen, allen zeer belangrijk voor het kunnen ophalen van de juiste strings
+        // bij de juiste onderdelen. Al deze ID componenten kunnen we dan makkelijk aanroepen.
+        //
+
         public static string getTunnelId(string tunnelDataString) 
         {
             string tunnelId = "";
@@ -515,7 +580,7 @@ namespace ClientProgram___correct
                     ClientInfo info = data1.clientinfo;
                     if (info.host.ToLower() == Dns.GetHostName().ToLower()) 
                     {
-                        Console.WriteLine(data1.id);
+                        //Console.WriteLine(data1.id);
                         idHost = data1.id;
                     }
                 }
@@ -553,7 +618,8 @@ namespace ClientProgram___correct
         public static void setSpeed(double speed) 
         {
             if (!emergenceStop) {
-                bikeSpeed = speed * 0.1;
+                bikeSpeed = speed * 0.01;
+                //Console.WriteLine(bikeSpeed.ToString("F"));
                 updateBikeSpeed();
             }
         }

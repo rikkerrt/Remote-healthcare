@@ -6,7 +6,6 @@ namespace ClientProgram
 {
     class Simulation : IBike 
     {
-
         private int Mode;
         private string Speed = "00";
         private string Distance = "00";
@@ -45,8 +44,6 @@ namespace ClientProgram
 
                 string Fietsdata = "A4 09 4E 05 10 19 " + Duration.ToString("X2") + " 00 " + Speed.Substring(2) + " " + Speed.Substring(0, 2) + " " + HeartBeat + " 24 84";
 
-                //Console.WriteLine(Fietsdata);
-                //Program.DataReceived(Fietsdata);
                 Thread.Sleep(1000);
             }
         }
@@ -73,7 +70,6 @@ namespace ClientProgram
             Speed = fillHex(Speed, 4);
             Distance = fillHex(Distance, 2);
             HeartBeat = fillHex(HeartBeat, 2);
-
         }
 
         public void ModeThree()
@@ -111,7 +107,6 @@ namespace ClientProgram
                     heartBeat = 0;
                 }
             }
-
             Speed = speed.ToString("X");
             Distance = randomDistance.ToString("X");
             HeartBeat = heartBeat.ToString("X");
@@ -155,7 +150,6 @@ namespace ClientProgram
             Distance = fillHex(Distance, 2);
             HeartBeat = fillHex(HeartBeat, 2);
             Duration++;
-
         }
 
         public string fillHex(string value, int max)
@@ -180,9 +174,6 @@ namespace ClientProgram
         {
             Console.WriteLine(resistance);
         }
-
-
-
 
         public string getSpeed()
         {

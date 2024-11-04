@@ -14,7 +14,7 @@ namespace FietsDemo
     public class Program
     {
         static int ID;
-        static IBike sim;
+        static IBike connection;
         static StreamWriter writer;
         static Stream stm;
         //static DataProtocol dataProtocol;
@@ -35,10 +35,10 @@ namespace FietsDemo
             //    Thread.Sleep(500);
             //    //Console.WriteLine();   
             //}
-            sim = new Simulation(3);
+            connection = new Connection();
             //dataProtocol = new  DataProtocol(sim); 
             sendData = true;
-
+            await VRConnection.Start();
 
             //while (true)
             //{
@@ -81,6 +81,7 @@ namespace FietsDemo
                 Thread dataReciever = new Thread(new ThreadStart(RecieveData));
                 dataReciever.Start();
                 SendData();
+               
             }
             catch (Exception e)
             {
@@ -99,21 +100,23 @@ namespace FietsDemo
                   
                     Data data = new Data(ID, 15, 16, 10, 76, 8,UserName);
 
-                    string input = sim.getSpeed();
+                    string input = connection.getSpeed();
                     data.Speed = Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2));
-                    Console.WriteLine(data.Speed);
-                    data.Distance = Calculations.GetDistance(sim.getDistance());
-                    Console.WriteLine(data.Distance);
-                    data.Time = Calculations.GetDuration(sim.getDuration());
-                    Console.WriteLine(data.Time);
-                    data.HeartBeat = Calculations.getHeartBeat(sim.getHeartBeat());
-                    Console.WriteLine(data.HeartBeat);
+                    //Console.WriteLine(data.Speed);
+                    data.Distance = Calculations.GetDistance(connection.getDistance());
+                    //Console.WriteLine(data.Distance);
+                    data.Time = Calculations.GetDuration(connection.getDuration());
+                    //Console.WriteLine(data.Time);
+                    data.HeartBeat = Calculations.getHeartBeat(connection.getHeartBeat());
+                    //Console.WriteLine("Heartbeat: " + data.HeartBeat);
 
-                    string jsonData = JsonConvert.SerializeObject(data);
+                        string jsonData = JsonConvert.SerializeObject(data);
                     writer.WriteLine(jsonData);
-                    Console.WriteLine("Data object in JSON sent.");
+                    //Console.WriteLine("Data object in JSON sent.");
 
-                    System.Threading.Thread.Sleep(10000);
+                    VRConnection.setSpeed(data.Speed);
+
+                    System.Threading.Thread.Sleep(500);
 
                     }
 
@@ -148,19 +151,19 @@ namespace FietsDemo
                         }
 
 
-                        Console.WriteLine("ik ben nu: "+send);
+                        //Console.WriteLine("ik ben nu: "+send);
                     }
 
                     else if (s.StartsWith("MESSAGE"))
                     {
                         string message = (s.Split('|')[1]);
-                        Console.WriteLine(message);
+                        //Console.WriteLine(message);
                     }
 
                     else if (s.StartsWith("RESISTANCE"))
                     {
                         int Resistance = int.Parse(s.Split('|')[1]);
-                        sim.sendResistance(Resistance);
+                        connection.sendResistance(Resistance);
                     }
 
                 }
