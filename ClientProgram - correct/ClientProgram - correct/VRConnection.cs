@@ -123,17 +123,16 @@ namespace ClientProgram___correct
         {
             length = new byte[4];
             int PrependLenght = 0;
-
-            while (PrependLenght < 4) 
+            do
             {
-                int dataPrependRead = await networkStream.ReadAsync(length, 0, length.Length);
+                int dataPrependRead = await networkStream.ReadAsync(length, 0, length.Length - PrependLenght);
                 PrependLenght += dataPrependRead;
-            }
-
+            } while (PrependLenght < 4); 
+            
             int lengthInt = BitConverter.ToInt32(length, 0);
             //Console.WriteLine(lengthInt);
            
-                dataBuffer = new byte[lengthInt];
+            dataBuffer = new byte[lengthInt];
            
 
             int readTotal = 0;
@@ -145,6 +144,7 @@ namespace ClientProgram___correct
             } while (readTotal < dataBuffer.Length);
 
             dataString = Encoding.UTF8.GetString(dataBuffer, 0, readTotal);
+           
             //Console.WriteLine("Response: " + Encoding.UTF8.GetString(dataBuffer, 0, readTotal) + "\n");
 
             /*while (PrependLenght < lengthInt)
