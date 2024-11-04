@@ -1,4 +1,7 @@
-﻿class encryption
+﻿using System.Security.Cryptography;
+using System.Text;
+
+class encryption
 {
     private static int lengthKey = 2048;
     public static (string, string) GenerateKeys()
