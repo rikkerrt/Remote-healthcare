@@ -76,6 +76,7 @@ public class server
     {
         string name = (message.Split('|')[1]);
         BikeID++;
+        bikeClients.Add(BikeID, socket);
         bikeClients1.Add(BikeID+": "+name, socket);
         Console.WriteLine("Fiets-client verbonden met ID: " + BikeID);
 
@@ -93,7 +94,7 @@ public class server
 
         else
         {
-            Console.WriteLine("doktor kan niet wroden ingesteld.");
+            Console.WriteLine("doktor kan niet worden ingesteld.");
             bikeHandlers.Add(bikeHandler);
         }
         bikeHandler.HandleBike();

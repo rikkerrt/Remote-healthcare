@@ -143,8 +143,6 @@ namespace DoctorClient
 
             //string selectedItem = ConnectedClients.SelectedItem.ToString();
             int selectedItem = int.Parse(ConnectedClients.SelectedItem.ToString().Split(':')[0]);
-
-
             connection.Write("Start " + selectedItem);
         }
         
@@ -242,6 +240,15 @@ namespace DoctorClient
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
             connection.Write("SENDMESSAGETOALL|"+ MessageTextBox.Text);
+
+
+        }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+
+        {
+            connection.Write("STOP " + lastSelectedDataID);
+            connection.Write("RESISTANCE|" + lastSelectedDataID + "|" + 200);
 
 
         }

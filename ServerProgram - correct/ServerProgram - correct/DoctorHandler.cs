@@ -143,10 +143,8 @@ namespace ServerProgram___correct
                     if (s.StartsWith("SENDMESSAGETO"))
                     {
 
-                        int id = int.Parse(s.Split('|')[1]);
-                        string Message = "MESSAGE|" + s.Split('|')[2];
-                        SendMessageToClient(id, Message);
-                        Console.WriteLine("Deze message wordt verstuurd" + Message + "Naar: " + id);
+                        string Message = "MESSAGE|Dokter: " + s.Split('|')[1];
+                        SendMessageToClient(Message);
 
                     }
 
@@ -211,6 +209,24 @@ namespace ServerProgram___correct
                     }
 
                     break; 
+                }
+            }
+        }
+
+        private void SendMessageToClient(string Message)
+        {
+            foreach (var bikeClient in server.bikeClients)
+            {
+                Socket clientSocket = bikeClient.Value;
+
+                if (clientSocket.Connected)
+                {
+                    byte[] messageBytes = Encoding.ASCII.GetBytes(Message);
+                    clientSocket.Send(messageBytes);
+                }
+                else
+                {
+                    Console.WriteLine("Client met ID " + bikeClient.Key + " is niet verbonden.");
                 }
             }
         }

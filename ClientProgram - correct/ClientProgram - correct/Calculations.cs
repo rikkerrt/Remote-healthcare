@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace ClientProgram___correct
 {
+    
     class Calculations
     {
         private static double Distance = 0;
