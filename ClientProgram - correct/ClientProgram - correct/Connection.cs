@@ -7,10 +7,10 @@ namespace ClientProgram___correct
 {
     class Connection : IBike
     {
-        private static string Speed = "00";
-        private static string Duration = "00";
-        private static string Distance = "00";
-        private static string HeartBeat = "00";
+        private static string speed = "00";
+        private static string duration = "00";
+        private static string distance = "00";
+        private static string heartBeat = "00";
         private static BLE bleBike;
 
         public Connection() 
@@ -64,14 +64,14 @@ namespace ClientProgram___correct
 
             if (filter.Substring(0, 2).Equals("16"))
             {
-                HeartBeat = filter.Substring(3,2);            }
+                heartBeat = filter.Substring(3,2);            }
             else
             {
                 if (filter.Substring(0,2).Equals("A4") && filter.Substring(12, 2).Equals("10"))
                 {
-                    Speed = filter.Substring(27, 2) + filter.Substring(24, 2);
-                    Duration = filter.Substring(18, 2);
-                    Distance = filter.Substring(21, 2);
+                    speed = filter.Substring(27, 2) + filter.Substring(24, 2);
+                    duration = filter.Substring(18, 2);
+                    distance = filter.Substring(21, 2);
                 }
             }
         }
@@ -133,22 +133,22 @@ namespace ClientProgram___correct
 
         public string getSpeed()
         {
-            return Speed;
+            return speed;
         }
 
         public string getDistance()
         {
-            return Distance;
+            return distance;
         }
 
         public string getDuration()
         {
-            return Duration;
+            return duration;
         }
 
         public string getHeartBeat()
         {
-            return HeartBeat;
+            return heartBeat;
         }
     }
 }

@@ -4,12 +4,12 @@ namespace ClientProgram___correct
 {
     class Calculations
     {
-        private static double Distance = 0;
-        private static int DistanceCount = 0;
+        private static double distance = 0;
+        private static int distanceCount = 0;
         private static int lastDistanceValue;
 
-        private static double Duration = 0;
-        private static int DurationCount = 0;
+        private static double duration = 0;
+        private static int durationCount = 0;
         private static int lastDurationValue;
 
         private static int HexToDecimal(string hexValue)
@@ -37,12 +37,12 @@ namespace ClientProgram___correct
             int decValue = HexToDecimal(distanceValue);
             if (decValue < lastDistanceValue)
             {
-                DistanceCount = DistanceCount + 1;
+                distanceCount = distanceCount + 1;
             }
-            Distance = decValue + (DistanceCount * 255);
+            distance = decValue + (distanceCount * 255);
             lastDistanceValue = decValue;
 
-            return Distance;
+            return distance;
 
         }
 
@@ -52,12 +52,12 @@ namespace ClientProgram___correct
             int decValue = HexToDecimal(HexDurationValue);
             if (decValue < lastDurationValue)
             {
-                DurationCount = DurationCount + 1;
+                durationCount = durationCount + 1;
             }
-            Duration = decValue + (DurationCount * 255);
+            duration = decValue + (durationCount * 255);
             lastDurationValue = decValue;
 
-            return (int)Duration / 4;
+            return (int)duration / 4;
 
         }
 
