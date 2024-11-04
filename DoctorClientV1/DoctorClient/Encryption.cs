@@ -4,6 +4,7 @@ using System.Text;
 class encryption
 {
     private static int lengthKey = 2048;
+
     public static (string, string) GenerateKeys()
     {
         using (RSA rsa = RSA.Create(lengthKey))

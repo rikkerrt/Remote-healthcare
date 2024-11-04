@@ -44,7 +44,6 @@ namespace DoctorClient
 
             asen = new ASCIIEncoding();
 
-
             isListening = true;
             StartListening();
         }
@@ -107,7 +106,6 @@ namespace DoctorClient
         {
             byte[] buffer = new byte[10024];
             
-
             while (isListening)
             {
                 try
@@ -154,7 +152,6 @@ namespace DoctorClient
 
                         else if (message.StartsWith("WW"))
                         {
-
                             string PassWord = message.Split('|')[1];
 
                             if (message.Contains("true"))
@@ -168,7 +165,6 @@ namespace DoctorClient
                                 Write("het is fout");
                             }
                         }
-
                         else if (message.StartsWith("HISTORY"))
                         {
                             string[] parts = message.Split("|");
@@ -261,6 +257,5 @@ namespace DoctorClient
         //    {
         //    }
         //}
-
     }
 }

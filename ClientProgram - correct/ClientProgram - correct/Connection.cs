@@ -11,7 +11,7 @@ namespace ClientProgram___correct
         private static string duration = "00";
         private static string distance = "00";
         private static string heartBeat = "00";
-        private static int Resistance = 0;
+        private static int resistance = 0;
         private static BLE bleBike;
 
         public Connection() 
@@ -34,23 +34,13 @@ namespace ClientProgram___correct
             errorCode = errorCode = await bleBike.OpenDevice("Tacx Flux 01249");
             errorCode = await bleHeart.OpenDevice("Decathlon Dual HR");
 
-            // __TODO__ Error check
-                
-            var services = bleBike.GetServices;
-            //foreach (var service in services)
-            //{
-            //    Console.WriteLine($"Service: {service.Name}");
-            //}
-
             Thread.Sleep(100);
             // Set service
             errorCode = await bleBike.SetService("6e40fec1-b5a3-f393-e0a9-e50e24dcca9e");
             await bleHeart.SetService("HeartRate");
-            // __TODO__ error check
 
             // Subscribe
             bleBike.SubscriptionValueChanged += BleBike_SubscriptionValueChanged;
-            //Console.WriteLine("bike connecion succesfull");
             bleHeart.SubscriptionValueChanged += BleBike_SubscriptionValueChanged;
             errorCode = await bleBike.SubscribeToCharacteristic("6e40fec2-b5a3-f393-e0a9-e50e24dcca9e");
             await bleHeart.SubscribeToCharacteristic("HeartRate");
@@ -61,7 +51,6 @@ namespace ClientProgram___correct
         private void BleBike_SubscriptionValueChanged(object sender, BLESubscriptionValueChangedEventArgs e)
         {
             String filter = BitConverter.ToString(e.Data).Replace("-", " ");
-            //Console.WriteLine("new reading got");
 
             if (filter.Substring(0, 2).Equals("16"))
             {
@@ -79,7 +68,7 @@ namespace ClientProgram___correct
 
         public void sendResistance(int resistance)
         {
-            Resistance = resistance;
+            Connection.resistance = resistance;
             byte data = 0x00;
             if (resistance > 200)
             {
@@ -150,7 +139,7 @@ namespace ClientProgram___correct
 
         public int getResistance()
         {
-            return Resistance;
+            return resistance;
         }
 
         public string getHeartBeat()

@@ -8,13 +8,13 @@ using System;
 
 public class server
 {
-    static int BikeID = 0;
+    static int bikeID = 0;
     public static Dictionary<int, Socket> bikeClients = new Dictionary<int, Socket>();
     public static Dictionary<string, Socket> bikeClients1 = new Dictionary<string, Socket>();
     public static Dictionary<Socket, string> keyList = new Dictionary<Socket, string>();
     public static DoctorHandler doctorHandler;
     public static List<BikeHandler> bikeHandlers = new List<BikeHandler>();
-    private static DataStorage DataStorage;
+    private static DataStorage dataStorage;
     private static string privateKey;
     private static string publicKey;
 
@@ -22,11 +22,10 @@ public class server
     {
         try
         {
-            DataStorage = new DataStorage("data.json");
-            BikeID = DataStorage.getHighestID();
+            dataStorage = new DataStorage("data.json");
+            bikeID = dataStorage.getHighestID();
 
             (publicKey, privateKey) = encryption.GenerateKeys();
-
 
             Data data = new Data(10, 1.1, 2.2, 10, 3, 8, "name");
             TcpListener myList = new TcpListener(IPAddress.Any, 8001);
@@ -81,10 +80,9 @@ public class server
         else if (s.StartsWith("d"))
         {
             HandleDoctor(socket, clientKey);
-        }
+        } 
         else
         {
-
             socket.Send(encryption.Encrypt(clientKey, "Je bent geïntialiseerd als niks"));
         }
         socket.Close();
@@ -94,10 +92,10 @@ public class server
     {
         keyList.Add(socket, clientKey);
         string name = (message.Split('|')[1]);
-        BikeID++;
-        bikeClients.Add(BikeID, socket);
-        bikeClients1.Add(BikeID+": "+name, socket);
-        Console.WriteLine("Fiets-client verbonden met ID: " + BikeID);
+        bikeID++;
+        bikeClients.Add(bikeID, socket);
+        bikeClients1.Add(bikeID+": "+name, socket);
+        Console.WriteLine("Fiets-client verbonden met ID: " + bikeID);
 
         if (doctorHandler != null)
         {
@@ -105,12 +103,11 @@ public class server
         }
 
 
-        BikeHandler bikeHandler = new BikeHandler(socket, BikeID, DataStorage, clientKey, privateKey);
+        BikeHandler bikeHandler = new BikeHandler(socket, bikeID, dataStorage, clientKey, privateKey);
         if (doctorHandler != null)
         {
             bikeHandler.SetDoctorHandler(doctorHandler);
         }
-
         else
         {
             Console.WriteLine("doktor kan niet worden ingesteld.");
@@ -118,12 +115,12 @@ public class server
         }
         bikeHandler.HandleBike();
 
-        bikeClients.Remove(BikeID);
+        bikeClients.Remove(bikeID);
     }
 
     public static void HandleDoctor(Socket socket, string docterKey)
     {
-        doctorHandler = new DoctorHandler(socket,DataStorage, docterKey, privateKey);
+        doctorHandler = new DoctorHandler(socket,dataStorage, docterKey, privateKey);
 
         doctorHandler.SendBikeClientList();
 
@@ -136,7 +133,6 @@ public class server
                 bikeHandler.SetDoctorHandler(doctorHandler);
             }
         }
-
         socket.Close();
     }
 }

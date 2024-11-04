@@ -37,7 +37,6 @@ namespace ClientProgram___correct
         public static byte[] prepend;
         public static byte[] data;
 
-
         public static async Task Start() 
         {
             client.Connect(_address, 6666);
@@ -106,9 +105,8 @@ namespace ClientProgram___correct
 
             SetupRouteWithNode();
             await ReadResponse();
-
-            
         }
+
         public static async Task updatePanel() {
             clearPanel();
             await ReadResponse();
@@ -119,6 +117,7 @@ namespace ClientProgram___correct
             swapBuffers();
             await ReadResponse();
         }
+
         //
         // Via deze methode wordt ieder binnenkomend bericht uitgelezen en verwerkt.
         //
@@ -133,17 +132,14 @@ namespace ClientProgram___correct
             } while (PrependLenght < 4); 
             
             int lengthInt = BitConverter.ToInt32(length, 0);
-            //Console.WriteLine(lengthInt);
            
             dataBuffer = new byte[lengthInt];
-           
 
             int readTotal = 0;
             do
             {
                 int read = await networkStream.ReadAsync(dataBuffer, readTotal, dataBuffer.Length - readTotal);
                 readTotal += read;
-                //Console.WriteLine(readTotal);
             } while (readTotal < dataBuffer.Length);
 
             dataString = Encoding.UTF8.GetString(dataBuffer, 0, readTotal);
@@ -173,7 +169,6 @@ namespace ClientProgram___correct
             //Console.WriteLine("vrconnection done");
         }
 
-
         //
         //  Via deze methode worden de te versturen bestanden klaargemaakt om door de tunnel te verzenden.
         //
@@ -185,6 +180,7 @@ namespace ClientProgram___correct
             networkStream.Write(combinedArray, 0, combinedArray.Length);
             //Console.WriteLine("Command send: " + Encoding.UTF8.GetString(combinedArray));
         }
+
         //
         // Deze methode zorgt voor een lijst met de sessie die beschikbaar zijn. Hiermee kunnen wij een connectie beginnen.
         //
@@ -195,6 +191,7 @@ namespace ClientProgram___correct
             prepend = new byte[] { (byte)jsonPacket.Length, 0x00, 0x00, 0x00 };
             SendPacket(prepend, data);
         }
+
         //
         // Deze methode zorgt voor een tunnel die de commando's voor de VR wereld sturen.
         //
@@ -214,6 +211,7 @@ namespace ClientProgram___correct
             byte[] prepend = BitConverter.GetBytes(data.Length);
             SendPacket(prepend, data);
         }
+
         //
         // Deze methode zorgt voor de eerste reset van de Scene van het hele terrein.
         //
@@ -294,7 +292,6 @@ namespace ClientProgram___correct
         //
         private static void addNodeToTerrain()
         {
-
             var nodeData = new 
             {
                 name = "terrain",
@@ -315,6 +312,7 @@ namespace ClientProgram___correct
 
             SendTunnelCommand("scene/node/add", nodeData);
         }
+
         //
         // Node voor het aanmaken voor het panel dat meerijdt met de gebruiker.
         //
@@ -344,6 +342,7 @@ namespace ClientProgram___correct
 
             SendTunnelCommand("scene/node/add", nodeData);
         }
+
         //
         // De fysieke node van de fiets, deze heeft een model van een fiets zodat het lijkt alsof deze daadwerkelijk rijd.
         //
@@ -370,6 +369,7 @@ namespace ClientProgram___correct
             };
             SendTunnelCommand("scene/node/add", bikeData);
         }
+
         private static void clearPanel()
         {
             var clearPanel = new
@@ -378,6 +378,7 @@ namespace ClientProgram___correct
             };
             SendTunnelCommand("scene/panel/clear", clearPanel);
         }
+
         private static void swapBuffers()
         {
             var bufferSwap = new
@@ -386,6 +387,7 @@ namespace ClientProgram___correct
             };
             SendTunnelCommand("scene/panel/swap", bufferSwap);
         }
+
         private static void speedToHud()
         {
             var speedToHud = new
@@ -399,6 +401,7 @@ namespace ClientProgram___correct
             };
             SendTunnelCommand("scene/panel/drawtext", speedToHud);
         }
+
         //
         // Met deze methode kunnen wij de snelheid aanpassen van de fiets. Met de update panel worden bovenstaande methoden aangeroepen
         // die het panel ook voorzien van de snelheid die dan up to date is.
@@ -462,6 +465,7 @@ namespace ClientProgram___correct
             };
             SendTunnelCommand("route/follow", followData);
         }
+
         //
         // Voorziet de terrein node van een laag met een foto erop. Dit zorgt voor de grassige ondergrond.
         //
@@ -479,6 +483,7 @@ namespace ClientProgram___correct
             };
             SendTunnelCommand("scene/node/addlayer", layerData);
         }
+
         //
         // De methode die een route aanmaakt voor de gebruiker om overheen te kunnen rijden.
         //
@@ -508,6 +513,7 @@ namespace ClientProgram___correct
             };
             SendTunnelCommand("route/show",showRouteData);
         }
+
         //
         // Voorziet de road die gemaakt is van een eigen texture. Hiermee krijgen we de weg die ook van asfalt gemaakt is.
         //
@@ -613,7 +619,6 @@ namespace ClientProgram___correct
                 JsonNode jsonnode = System.Text.Json.JsonSerializer.SerializeToNode(dataObject);
                 return jsonnode["id"].GetValue<string>();
             }*/
-
         }
 
         public static void setSpeed(double speed) 
@@ -662,8 +667,6 @@ namespace ClientProgram___correct
             string jsonPacket = "{\"id\" : \"scene/terrain/getheight\", \"data\" : {\"position\" : [10.2,4.4], \"positions\" : [[10.2,4.4],[11.2,4.4],[12.2,4.4]]}}";
             sendTunnel(jsonPacket);
         }*/
-
-
     }
 
     internal class JsonData 

@@ -25,35 +25,13 @@ namespace FietsDemo
 
         public static async Task Main()
         {
-
             Console.Write("Wat is je naam? ");
             UserName = Console.ReadLine();
             Console.WriteLine("je username ="+UserName);
 
-            //IBike sim = new Simulation(3);
-            //while (true)
-            //{
-            //    string input = sim.getSpeed();
-            //    Console.WriteLine(Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2)));
-            //    Thread.Sleep(500);
-            //    //Console.WriteLine();   
-            //}
             connection = new Connection();
-            //dataProtocol = new  DataProtocol(sim); 
             sendData = false;
-            //Console.WriteLine("vr");
             await VRConnection.Start();
-
-            //while (true)
-            //{
-            //    string input = sim.getDistance();
-            //    //Console.WriteLine(Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2)));
-            //    //Console.WriteLine(input);
-            //    Console.WriteLine(Calculations.GetDistance(input));
-            //    Thread.Sleep(500);
-            //    //Console.WriteLine();   
-            //}
-
 
             try
             {
@@ -64,7 +42,6 @@ namespace FietsDemo
                 stm = tcpclnt.GetStream();
                 (publicKey, privateKey) = encryption.GenerateKeys();
 
-
                 // recieve public key
                 byte[] buffer = new byte[2048];
                 int bytesRead = stm.Read(buffer, 0, buffer.Length);
@@ -73,7 +50,6 @@ namespace FietsDemo
                 serverKey = Encoding.UTF8.GetString(result);
 
                 // send public key
-                
                 stm.Write(Encoding.ASCII.GetBytes(publicKey), 0, Encoding.ASCII.GetBytes(publicKey).Length);
 
                 // send client id
@@ -92,8 +68,7 @@ namespace FietsDemo
                 Thread dataReciever = new Thread(new ThreadStart(RecieveData));
                 dataReciever.Start();
                 SendData();
-               
-            }
+            } 
             catch (Exception e)
             {
                 Console.WriteLine("Error..... " + e.StackTrace);
@@ -130,10 +105,8 @@ namespace FietsDemo
 
                     VRConnection.setSpeed(data.Speed);
 
-                    System.Threading.Thread.Sleep(500);
-
+                    Thread.Sleep(500);
                     }
-
                 }
             } 
             catch (Exception e) 
@@ -169,15 +142,10 @@ namespace FietsDemo
                             sendData = false;
                             VRConnection.setEmergencyStop(!sendData);
                         }
-
-
-                        //Console.WriteLine("ik ben nu: "+send);
                     }
-
                     else if (s.StartsWith("MESSAGE"))
                     {
                         string message = (s.Split('|')[1]);
-                        //Console.WriteLine(message);
                     }
 
                     else if (s.StartsWith("RESISTANCE"))
@@ -185,7 +153,6 @@ namespace FietsDemo
                         int Resistance = int.Parse(s.Split('|')[1]);
                         connection.sendResistance(Resistance);
                     }
-
                 }
             }
             catch (Exception e)

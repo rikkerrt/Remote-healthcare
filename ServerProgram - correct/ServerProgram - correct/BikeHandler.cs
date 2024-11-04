@@ -8,45 +8,42 @@ using System.Threading.Tasks;
 
 namespace ServerProgram___correct
 {
-   
     public class BikeHandler
     {
-        private DoctorHandler DoctorHandler { get; set; } 
-        private Socket Socket;
-        private int BikeId;
-        private DataStorage DataStorage;
+        private DoctorHandler doctorHandler { get; set; } 
+        private Socket socket;
+        private int bikeIdb;
+        private DataStorage dataStorage;
         private string clientKey;
         private string serverKey;
 
-
         public BikeHandler(Socket socket, int bikeId, DataStorage dataStorage, string clientKey, string serverKey)
         {
-            Socket = socket;
-            BikeId = bikeId;
+            this.socket = socket;
+            bikeIdb = bikeId;
             Console.WriteLine(bikeId);
-            DataStorage = dataStorage;
-            Console.WriteLine(DataStorage.getHighestID());
+            this.dataStorage = dataStorage;
+            Console.WriteLine(this.dataStorage.getHighestID());
             this.clientKey = clientKey;
             this.serverKey = serverKey;
         }
 
         public void SetDoctorHandler(DoctorHandler doctorHandler)
         {
-            DoctorHandler = doctorHandler;
+            this.doctorHandler = doctorHandler;
         }
 
 
         public void HandleBike()
         {
-
             ASCIIEncoding asen = new ASCIIEncoding();
-            Socket.Send(encryption.Encrypt(clientKey, BikeId.ToString()));
+            socket.Send(encryption.Encrypt(clientKey, bikeIdb.ToString()));
             while (true)
             {
                 try
                 {
                     byte[] buffer = new byte[2048];
-                    int bytesRead = Socket.Receive(buffer);
+                    int bytesRead = socket.Receive(buffer);
                     byte[] result = new byte[bytesRead];
                     Array.Copy(buffer, result, bytesRead);
 
@@ -56,24 +53,22 @@ namespace ServerProgram___correct
                         break;
                     }
 
-
                     string jsonData = encryption.Decrypt(serverKey, result);
                     Console.WriteLine(jsonData);
 
                     Data data = JsonConvert.DeserializeObject<Data>(jsonData);
 
-                    DataStorage.AddData(BikeId, data);
-                    DataStorage.SaveDataToFile();
+                    dataStorage.AddData(bikeIdb, data);
+                    dataStorage.SaveDataToFile();
 
-                    if (DoctorHandler != null)
+                    if (doctorHandler != null)
                     {
-                        DoctorHandler.SendHealthDataToDoctor(jsonData);
+                        doctorHandler.SendHealthDataToDoctor(jsonData);
                     }
                     else
                     {
                         Console.WriteLine("Error: DoctorHandler is niet ingesteld.");
                     }
-                    
                 }
                 catch (Exception e)
                 {
@@ -81,10 +76,7 @@ namespace ServerProgram___correct
                     break;
                 }
             }
-            
-            Socket.Close();
+            socket.Close();
         }        
-
-
     }
 }

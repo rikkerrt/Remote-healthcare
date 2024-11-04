@@ -12,14 +12,12 @@ namespace ServerProgram___correct
 {
     public class DoctorHandler
     {
-
         private Socket Socket;
         private Dictionary<int, ClientSession> clientSessions = new Dictionary<int, ClientSession>();
         private string RightPassword;
         private DataStorage DataStorage;
         private string clientKey;
         private string serverKey;
-
 
         public DoctorHandler(Socket socket, DataStorage dataStorage, string appKey, string serKey)
         {
@@ -33,15 +31,11 @@ namespace ServerProgram___correct
         public void HandleDoctor()
         {
             ASCIIEncoding asen = new ASCIIEncoding();
-            //Socket.Send(asen.GetBytes(Socket.ToString()));
-            //SendBikeClientList();
-
 
             while (true)
             {
                 try
                 {
-
                     byte[] buffer = new byte[10024];
                     int bytesRead = Socket.Receive(buffer);
                     byte[] result = new byte[bytesRead];
@@ -51,7 +45,6 @@ namespace ServerProgram___correct
 
                     String s = encryption.Decrypt(serverKey, result);
                     Console.WriteLine(s);
-
 
                     if (s.StartsWith("WW"))
                     {
@@ -76,7 +69,6 @@ namespace ServerProgram___correct
                         byte[] messageBytes = Encoding.ASCII.GetBytes(bikeDataString);
                         Socket.Send(messageBytes);
                     }
-
 
                     if (s.StartsWith("DATA"))
                     {
@@ -111,7 +103,6 @@ namespace ServerProgram___correct
                         int Resistance = int.Parse(s.Split('|')[2]);
                         SendMessageToClient(id, "RESISTANCE|"+Resistance);
                         Console.WriteLine("Deze resistance" + Resistance + "word ingesteld bij: " + id);
-
                     }
 
                     if (s.StartsWith("MESSAGE|"))
@@ -136,24 +127,17 @@ namespace ServerProgram___correct
                         //        Console.WriteLine("Ongeldig ID-formaat.");
                         //    }
                         //}
-
                         int id = int.Parse(s.Split('|')[1]);
                         string Message ="MESSAGE|"+s.Split('|')[2];
                         SendMessageToClient(id,Message);
                         Console.WriteLine("Deze message wordt verstuurd"+Message+"Naar: "+id);
-
                     }
-
 
                     if (s.StartsWith("SENDMESSAGETO"))
-                    {
-
+                    { 
                         string Message = "MESSAGE|Dokter: " + s.Split('|')[1];
                         SendMessageToClient(Message);
-
                     }
-
-
                     else
                     {
 
@@ -165,8 +149,6 @@ namespace ServerProgram___correct
                     Console.WriteLine("Error met ontvangen van data: " + e);
                     break;
                 }
-
-
             }
             Socket.Close();
         }

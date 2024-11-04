@@ -31,7 +31,6 @@ namespace ServerProgram___correct
             {
                 highestKey = 0;
             }
-
             return highestKey;
         }
 

@@ -2,7 +2,6 @@
 
 namespace ClientProgram___correct
 {
-    
     class Calculations
     {
         private static double distance = 0;
@@ -34,7 +33,6 @@ namespace ClientProgram___correct
 
         public static double GetDistance(string distanceValue)
         {
-
             int decValue = HexToDecimal(distanceValue);
             if (decValue < lastDistanceValue)
             {
@@ -44,12 +42,10 @@ namespace ClientProgram___correct
             lastDistanceValue = decValue;
 
             return distance;
-
         }
 
         public static int GetDuration(string HexDurationValue)
         {
-
             int decValue = HexToDecimal(HexDurationValue);
             if (decValue < lastDurationValue)
             {
@@ -59,7 +55,6 @@ namespace ClientProgram___correct
             lastDurationValue = decValue;
 
             return (int)duration / 4;
-
         }
 
         public static int getHeartBeat(string HeartBeatValue)
