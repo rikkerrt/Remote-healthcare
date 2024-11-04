@@ -35,10 +35,10 @@ namespace FietsDemo
             //    Thread.Sleep(500);
             //    //Console.WriteLine();   
             //}
-            sim = new Simulation(3);
+            sim = new Connection();
             //dataProtocol = new  DataProtocol(sim); 
             sendData = true;
-
+            await VRConnection.Start();
 
             //while (true)
             //{
@@ -81,6 +81,7 @@ namespace FietsDemo
                 Thread dataReciever = new Thread(new ThreadStart(RecieveData));
                 dataReciever.Start();
                 SendData();
+               
             }
             catch (Exception e)
             {
@@ -101,19 +102,21 @@ namespace FietsDemo
 
                     string input = sim.getSpeed();
                     data.Speed = Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2));
-                    Console.WriteLine(data.Speed);
+                    //Console.WriteLine(data.Speed);
                     data.Distance = Calculations.GetDistance(sim.getDistance());
-                    Console.WriteLine(data.Distance);
+                    //Console.WriteLine(data.Distance);
                     data.Time = Calculations.GetDuration(sim.getDuration());
-                    Console.WriteLine(data.Time);
+                    //Console.WriteLine(data.Time);
                     data.HeartBeat = Calculations.getHeartBeat(sim.getHeartBeat());
-                    Console.WriteLine(data.HeartBeat);
+                    //Console.WriteLine(data.HeartBeat);
 
                     string jsonData = JsonConvert.SerializeObject(data);
                     writer.WriteLine(jsonData);
-                    Console.WriteLine("Data object in JSON sent.");
+                    //Console.WriteLine("Data object in JSON sent.");
 
-                    System.Threading.Thread.Sleep(10000);
+                    VRConnection.setSpeed(data.Speed);
+
+                    System.Threading.Thread.Sleep(500);
 
                     }
 
@@ -148,13 +151,13 @@ namespace FietsDemo
                         }
 
 
-                        Console.WriteLine("ik ben nu: "+send);
+                        //Console.WriteLine("ik ben nu: "+send);
                     }
 
                     else if (s.StartsWith("MESSAGE"))
                     {
                         string message = (s.Split('|')[1]);
-                        Console.WriteLine(message);
+                        //Console.WriteLine(message);
                     }
 
                     else if (s.StartsWith("RESISTANCE"))

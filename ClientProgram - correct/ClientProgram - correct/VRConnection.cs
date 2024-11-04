@@ -63,7 +63,7 @@ namespace ClientProgram___correct
             await ReadResponse();
 
             uuIDstring = getUUIDstring(dataString);
-            Console.WriteLine("De string van de textures " + uuIDstring);
+            //Console.WriteLine("De string van de textures " + uuIDstring);
 
             addLayerToNode(uuIDstring);
             await ReadResponse();
@@ -72,7 +72,7 @@ namespace ClientProgram___correct
             await ReadResponse();
 
             routeID = getRouteID(dataString);
-            Console.WriteLine("Route ID " + routeID);
+            //Console.WriteLine("Route ID " + routeID);
 
             showRouteOnMap();
             await ReadResponse();
@@ -88,7 +88,7 @@ namespace ClientProgram___correct
             await ReadResponse();
 
             cameraIDstring = getUtillID(dataString);
-            Console.WriteLine("Camera ID " + cameraIDstring);
+            //Console.WriteLine("Camera ID " + cameraIDstring);
 
             addBikeNode();
             await ReadResponse();
@@ -97,7 +97,7 @@ namespace ClientProgram___correct
             await ReadResponse();
 
             hudID = getUUIDstring(dataString);
-            Console.WriteLine("Hud ID: " + hudID);
+            //Console.WriteLine("Hud ID: " + hudID);
 
             clearPanel();
             await ReadResponse();
@@ -136,7 +136,7 @@ namespace ClientProgram___correct
             } while (readTotal < dataBuffer.Length);
 
             dataString = Encoding.UTF8.GetString(dataBuffer, 0, readTotal);
-            Console.WriteLine("Response: " + Encoding.UTF8.GetString(dataBuffer, 0, readTotal) + "\n");
+            //Console.WriteLine("Response: " + Encoding.UTF8.GetString(dataBuffer, 0, readTotal) + "\n");
 
             /*while (PrependLenght < lengthInt)
             {
@@ -515,7 +515,7 @@ namespace ClientProgram___correct
                     ClientInfo info = data1.clientinfo;
                     if (info.host.ToLower() == Dns.GetHostName().ToLower()) 
                     {
-                        Console.WriteLine(data1.id);
+                        //Console.WriteLine(data1.id);
                         idHost = data1.id;
                     }
                 }
@@ -553,7 +553,7 @@ namespace ClientProgram___correct
         public static void setSpeed(double speed) 
         {
             if (!emergenceStop) {
-                bikeSpeed = speed * 0.1;
+                bikeSpeed = speed * 0.01;
                 updateBikeSpeed();
             }
         }
