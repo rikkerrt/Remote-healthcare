@@ -44,7 +44,7 @@ namespace FietsDemo
             //}
             sim = new Simulation(3);
             //dataProtocol = new  DataProtocol(sim); 
-            sendData = false;
+            sendData = true;
 
 
             //while (true)
