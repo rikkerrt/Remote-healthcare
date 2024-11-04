@@ -26,9 +26,14 @@ namespace FietsDemo
         static Stream stm;
         //static DataProtocol dataProtocol;
         static bool sendData;
+        static string UserName;
 
         public static void Main()
         {
+
+            Console.Write("Wat is je naam? ");
+            UserName = Console.ReadLine();
+
             //IBike sim = new Simulation(3);
             //while (true)
             //{
@@ -153,10 +158,16 @@ namespace FietsDemo
                         Console.WriteLine("ik ben nu: "+send);
                     }
 
-                    else if (s.StartsWith("message"))
+                    else if (s.StartsWith("MESSAGE"))
                     {
                         string message = (s.Split('|')[1]);
                         Console.WriteLine(message);
+                    }
+
+                    else if (s.StartsWith("RESISTANCE"))
+                    {
+                        int Resistance = int.Parse(s.Split('|')[1]);
+                        sim.sendResistance(Resistance);
                     }
 
                 }

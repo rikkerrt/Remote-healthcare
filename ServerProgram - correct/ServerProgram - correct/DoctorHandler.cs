@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,11 +15,15 @@ namespace ServerProgram___correct
 
         private Socket Socket;
         private Dictionary<int, ClientSession> clientSessions = new Dictionary<int, ClientSession>();
+        private string RightPassword;
+        private DataStorage DataStorage;
 
 
-        public DoctorHandler(Socket socket)
+        public DoctorHandler(Socket socket, DataStorage dataStorage)
         {
             Socket = socket;
+            RightPassword = "pieter";
+            DataStorage = dataStorage;  
         }
 
         public void HandleDoctor()
@@ -25,6 +31,8 @@ namespace ServerProgram___correct
             ASCIIEncoding asen = new ASCIIEncoding();
             Socket.Send(asen.GetBytes(Socket.ToString()));
             SendBikeClientList();
+            Socket.Send(asen.GetBytes("WW|true"));
+
 
             while (true)
             {
@@ -39,12 +47,34 @@ namespace ServerProgram___correct
                     Console.WriteLine(s);
 
 
+                    if (s.StartsWith("WW"))
+                    {
+                        string PassWord = (s.Split('|')[1]);
+
+                        if (PassWord.Equals(RightPassword))
+                        {
+                            byte[] messageBytes = asen.GetBytes("WW|true");
+                            Socket.Send(messageBytes);
+                        }
+                        else
+                        {
+                            byte[] messageBytes = asen.GetBytes("WW|false");
+                            Socket.Send(messageBytes);
+                        }
+                    }
+
+                    if (s.StartsWith("GETHISTORY"))
+                    {
+                        Dictionary<int, List<Data>> History = DataStorage.getAllData();
+                        string bikeDataString = "HISTORY|" + JsonConvert.SerializeObject(History);
+                        byte[] messageBytes = asen.GetBytes(bikeDataString);
+                        Socket.Send(messageBytes);
+                    }
+
+
                     if (s.StartsWith("DATA"))
                     {
-
                         Console.WriteLine("IK HEB DATA ONTVANGEN");
-
-
                     }
 
                     if (s.StartsWith("getBikes"))
@@ -55,45 +85,75 @@ namespace ServerProgram___correct
                     
                     if (s.StartsWith("Start"))
                     {
-
                         int id = int.Parse(s.Split(' ')[1]);
                         Console.WriteLine("Start sessie voor client met ID: " + id);
 
                         SendMessageToClient(id, "sendData| true");
+                    }
+                    
+                    if (s.StartsWith("STOP"))
+                    {
+                        int id = int.Parse(s.Split(' ')[1]);
+                        Console.WriteLine("Stop sessie voor client met ID: " + id);
 
-
+                        SendMessageToClient(id, "sendData| false");
+                    }
+                    
+                    if (s.StartsWith("RESISTANCE"))
+                    {
+                        int id = int.Parse(s.Split(' ')[1]);
+                        int Resistance = int.Parse(s.Split('|')[2]);
+                        SendMessageToClient(id, "RESISTANCE"+Resistance);
+                        Console.WriteLine("Deze resistance" + Resistance + "word ingesteld bij: " + id);
 
                     }
 
-                    if (s.StartsWith("SendMessageToClient"))
+                    if (s.StartsWith("MESSAGE|"))
                     {
-                        string trimmedMessage = s.Substring("SendMessageToClient".Length).Trim();
+                        //string trimmedMessage = s.Substring("MESSAGE|".Length).Trim();
 
-                        int firstSpaceIndex = trimmedMessage.IndexOf(' ');
+                        //int firstSpaceIndex = trimmedMessage.IndexOf('|');
 
-                        if (firstSpaceIndex > -1)
-                        {
-                            string idPart = trimmedMessage.Substring(0, firstSpaceIndex);
-                            int id;
-                            if (int.TryParse(idPart, out id)) 
-                            {
-                                string message = trimmedMessage.Substring(firstSpaceIndex + 1);
+                        //if (firstSpaceIndex > -1)
+                        //{
+                        //    string idPart = trimmedMessage.Substring(0, firstSpaceIndex);
+                        //    int id;
+                        //    if (int.TryParse(idPart, out id)) 
+                        //    {
+                        //        string message = trimmedMessage.Substring(firstSpaceIndex + 1);
 
-                                SendMessageToClient(id, message);
-                                Console.WriteLine(message + "is gestuurd naar" + id);
-                            }
-                            else
-                            {
-                                Console.WriteLine("Ongeldig ID-formaat.");
-                            }
-                        }
+                        //        SendMessageToClient(id, "MESSAGE|"+message);
+                        //        Console.WriteLine(message + "is gestuurd naar" + id);
+                        //    }
+                        //    else
+                        //    {
+                        //        Console.WriteLine("Ongeldig ID-formaat.");
+                        //    }
+                        //}
+
+                        int id = int.Parse(s.Split('|')[1]);
+                        string Message ="MESSAGE|"+s.Split('|')[2];
+                        SendMessageToClient(id,Message);
+                        Console.WriteLine("Deze message wordt verstuurd"+Message+"Naar: "+id);
+
+                    }
+
+
+                    if (s.StartsWith("SENDMESSAGETO"))
+                    {
+
+                        int id = int.Parse(s.Split('|')[1]);
+                        string Message = "MESSAGE|" + s.Split('|')[2];
+                        SendMessageToClient(id, Message);
+                        Console.WriteLine("Deze message wordt verstuurd" + Message + "Naar: " + id);
+
                     }
 
 
                     else
                     {
-                        Socket.Send(asen.GetBytes("Je bent geïntialiseerd als niks"));
 
+                        Console.WriteLine("Dit bericht heb ik binnen"+s);
                     }
                 }
                 catch (Exception e)

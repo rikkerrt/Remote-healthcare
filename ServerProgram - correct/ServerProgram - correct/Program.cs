@@ -12,11 +12,15 @@ public class server
     public static Dictionary<int, Socket> bikeClients = new Dictionary<int, Socket>();
     public static DoctorHandler doctorHandler;
     public static List<BikeHandler> bikeHandlers = new List<BikeHandler>();
+    private static DataStorage DataStorage;
 
     public static void Main()
     {
         try
         {
+            DataStorage = new DataStorage("data.json");
+
+
             Data data = new Data(10, 1.1, 2.2, 10, 3, 8);
             TcpListener myList = new TcpListener(IPAddress.Any, 8001);
             myList.Start();
@@ -76,7 +80,7 @@ public class server
         }
 
 
-        BikeHandler bikeHandler = new BikeHandler(socket, i);
+        BikeHandler bikeHandler = new BikeHandler(socket, i, DataStorage);
         if (doctorHandler != null)
         {
             bikeHandler.SetDoctorHandler(doctorHandler);
@@ -94,7 +98,7 @@ public class server
 
     public static void HandleDoctor(Socket socket)
     {
-        doctorHandler = new DoctorHandler(socket);
+        doctorHandler = new DoctorHandler(socket,DataStorage);
 
         doctorHandler.SendBikeClientList();
 

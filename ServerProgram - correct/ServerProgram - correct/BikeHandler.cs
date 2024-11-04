@@ -14,11 +14,15 @@ namespace ServerProgram___correct
         private DoctorHandler DoctorHandler { get; set; } 
         private Socket Socket;
         private int BikeId;
+        private DataStorage DataStorage;
 
-        public BikeHandler(Socket socket, int bikeId)
+
+        public BikeHandler(Socket socket, int bikeId, DataStorage dataStorage)
         {
             Socket = socket;
             BikeId = bikeId;
+            DataStorage = dataStorage;
+
         }
 
         public void SetDoctorHandler(DoctorHandler doctorHandler)
@@ -47,6 +51,11 @@ namespace ServerProgram___correct
 
 
                     string jsonData = Encoding.ASCII.GetString(buffer, 0, receivedBytes).Trim();
+
+                    Data data = JsonConvert.DeserializeObject<Data>(jsonData);
+
+                    DataStorage.AddData(BikeId, data);
+                    DataStorage.SaveDataToFile();
 
                     if (DoctorHandler != null)
                     {
