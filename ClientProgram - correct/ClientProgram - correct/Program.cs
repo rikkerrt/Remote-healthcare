@@ -1,236 +1,110 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System;
 using System.Threading;
-using System.Threading.Tasks;
-using Avans.TI.BLE;
+using System.IO;
+using System.Net;
+using System.Text;
+using System.Net.Sockets;
+using Newtonsoft.Json;
+using ClientProgram___correct;
 using ClientProgram;
+using System.Threading.Tasks;
 
-namespace FietsDemo {
-    class Program {
+namespace FietsDemo
+{
+    public class Program
+    {
+        static int ID;
 
-        private static bool FirstRun = false;
-        private static double DurationDeviation = 0;
-        private static double DistanceDeviation = 0;
-        static async Task Main(string[] args) {
-            //new Simulation();
-            int errorCode = 0;
-            BLE bleBike = new BLE();
-            BLE bleHeart = new BLE();
-            Thread.Sleep(1000); // We need some time to list available devices
+        public static async Task Main()
+        {
+            await VRConnection.Start();
+            
 
-            // List available devices
-            List<String> bleBikeList = bleBike.ListDevices();
-            Console.WriteLine("Devices found: ");
-            foreach (var name in bleBikeList) {
-                Console.WriteLine($"Device: {name}");
+            IBike sim = new Simulation(3);
+            while (true)
+            {
+                string input = sim.getSpeed();
+                Console.WriteLine(Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2)));
+                VRConnection.setSpeed(Calculations.GetSpeed(input.Substring(2), input.Substring(0,2)));
+                Thread.Sleep(500);
+                //Console.WriteLine();   
             }
 
-            // Connecting
-            errorCode = errorCode = await bleBike.OpenDevice("Tacx Flux 01140");
-            errorCode = await bleHeart.OpenDevice("Decathlon Dual HR");
 
-            // __TODO__ Error check
+            try
+            {
+                TcpClient tcpclnt = new TcpClient();
+                Console.WriteLine("Connecting.....");
+                tcpclnt.Connect(IPAddress.Loopback, 8001);
+                Console.WriteLine("Connected");
 
-            var services = bleBike.GetServices;
-            foreach (var service in services) {
-                Console.WriteLine($"Service: {service.Name}");
-            }
+                Stream stm = tcpclnt.GetStream();
+                ASCIIEncoding asen = new ASCIIEncoding();
 
-            // Set service
-            errorCode = await bleBike.SetService("6e40fec1-b5a3-f393-e0a9-e50e24dcca9e");
-            await bleHeart.SetService("HeartRate");
-            // __TODO__ error check
+                stm.Write(asen.GetBytes("f"), 0, asen.GetBytes("f").Length);
+                byte[] buffer = new byte[100];
+                int bytesRead = stm.Read(buffer, 0, buffer.Length);
+                String Respons = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                int IntResponse = Convert.ToInt32(Respons);
+                ID = IntResponse;
 
-            // Subscribe
-            bleBike.SubscriptionValueChanged += BleBike_SubscriptionValueChanged;
-            bleHeart.SubscriptionValueChanged += BleBike_SubscriptionValueChanged;
-            errorCode = await bleBike.SubscribeToCharacteristic("6e40fec2-b5a3-f393-e0a9-e50e24dcca9e");
-            await bleHeart.SubscribeToCharacteristic("HeartRate");
+                StreamWriter writer = new StreamWriter(stm);
+                writer.AutoFlush = true;
 
-            sendResistance(bleBike);
+                //IBike sim = new Simulation(1);
 
-            Console.Read();
-        }
+                while (true)
+                {
+                    Data data = new Data(ID, 15, 16, 10, 76);
 
-        private static void BleBike_SubscriptionValueChanged(object sender, BLESubscriptionValueChangedEventArgs e) {
-            //Console.WriteLine("ontvangen");
-            //Console.WriteLine("Received from {0}: {1}, {2}", e.ServiceName,
-            //    BitConverter.ToString(e.Data).Replace("-", " "),
-            //Encoding.UTF8.GetString(e.Data));
+                    string input = sim.getSpeed();
+                    data.Speed = Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2));
+                    data.Distance = Calculations.GetDistance(sim.getDistance());
+                    data.Time = Calculations.GetDuration(sim.getDuration());
+                    //data.HeartBeat = Calculations.get
 
-            String filter = BitConverter.ToString(e.Data).Replace("-", " ");
+                    string jsonData = JsonConvert.SerializeObject(data);
+                    writer.WriteLine(jsonData);
+                    Console.WriteLine("Data object in JSON sent.");
 
-            if (filter.Substring(0, 2).Equals("16")) {
-                Console.WriteLine(filter + "\n");
-            }
-            else {
-                if (filter.Substring(12, 2).Equals("10")) {
-                    if (FirstRun) {
-                        Console.WriteLine("Je bent in de IF");
-                        DurationDeviation = GetDuration(filter.Substring(18, 2));
-                        DistanceDeviation = GetDistance(filter.Substring(21, 2));
-                        FirstRun = false;
-                    }
+                    System.Threading.Thread.Sleep(10000);
 
-                    //Console.WriteLine("Afstand: " + GetDistance("aa"));
-                    //Console.WriteLine("Snelheid: " + GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2)) + " Km/h");
-                    //Console.WriteLine("Tijd: " + GetDuration("ab" + " S"));
-
-                    double Speed = GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2));
-                    Console.WriteLine(Speed);
-                    double Duration = GetDuration(filter.Substring(18, 2)) - DurationDeviation;
-                    double Distance = GetDistance(filter.Substring(21, 2)) - DistanceDeviation;
-
-                    //Console.WriteLine("Tijdsduur: " + Duration);
-                    //Console.WriteLine("Afstand: " + Distance);
-                    //Console.WriteLine("Snelheid: " + Speed + "\n");
-                }
-                else {
-                    Console.WriteLine(filter + "\n");
                 }
             }
-        }
-
-        public static void DataReceived(string data) {
-            if (data.Substring(0, 2).Equals("16")) {
-                Console.WriteLine(data + "\n");
-            }
-            else {
-                if (data.Substring(12, 2).Equals("10")) {
-                    if (FirstRun) {
-                        Console.WriteLine("Je bent in de IF");
-                        DurationDeviation = GetDuration(data.Substring(18, 2));
-                        DistanceDeviation = GetDistance(data.Substring(21, 2));
-                        FirstRun = false;
-                    }
-
-                    //Console.WriteLine("Afstand: " + GetDistance("aa"));
-                    //Console.WriteLine("Snelheid: " + GetSpeed(filter.Substring(24, 2), filter.Substring(27, 2)) + " Km/h");
-                    //Console.WriteLine("Tijd: " + GetDuration("ab" + " S"));
-
-                    double Speed = GetSpeed(data.Substring(24, 2), data.Substring(27, 2));
-                    double Duration = GetDuration(data.Substring(18, 2)) - DurationDeviation;
-                    double Distance = GetDistance(data.Substring(21, 2)) - DistanceDeviation;
-
-                    Console.WriteLine("Tijdsduur: " + Duration);
-                    Console.WriteLine("Afstand: " + Distance);
-                    Console.WriteLine("Snelheid: " + Speed + "\n");
-                }
-                else {
-                    Console.WriteLine(data + "\n");
-                }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error..... " + e.StackTrace);
             }
         }
+        
+        [Serializable]
+        public class Data
+        {
+            private int id;
+            private double speed;
+            private double distance;
+            private double time;
+            private int heartBeat;
 
-
-        public static void sendResistance(BLE bleBike) {
-
-            byte[] bytes = { 0xA4, 0x09, 0x4E, 0x05, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };  //laatste veranderen 
-
-            byte checkSum = 0x00;
-            for (int i = 0; i < bytes.Length - 1; i++) {
-                checkSum ^= bytes[i];
+            public Data(int id, double speed, double distance, int time, int heartBeat)
+            {
+                this.ID = id;
+                this.Speed = speed;
+                this.Distance = distance;
+                this.Time = time;
+                this.HeartBeat = heartBeat;
             }
 
-            byte[] toSend = new byte[bytes.Length + 1];
-            bytes.CopyTo(toSend, 0);
-            toSend[toSend.Length - 1] = checkSum;
+            public int ID { get; set; }
+            public double Speed { get; set; }
+            public double Distance { get; set; }
+            public int Time { get; set; }
+            public int HeartBeat { get; set; }
 
-            bleBike.WriteCharacteristic("6e40fec3-b5a3-f393-e0a9-e50e24dcca9e", toSend);
-            Console.WriteLine("done");
-        }
-
-        private static int HexToDecimal(string hexValue) {
-            int decValue = int.Parse(hexValue, System.Globalization.NumberStyles.HexNumber);
-            return decValue;
-
-        }
-
-        private static double GetSpeed(string LSB, string MSB) {
-            //string TotalHexValue = MSB + LSB;
-            //int DecValue = HexToDecimal(TotalHexValue);
-            //Double SpeedInKmH = (DecValue * 0.001) * 3.6;
-            //return SpeedInKmH;
-
-            return Calculations.GetSpeed(LSB, MSB);
-        }
-
-        public static double GetDistance(string distanceValue) {
-
-            //int decValue = HexToDecimal(distanceValue);
-            //if (decValue < lastDistanceValue) {
-            //    DistanceCount = DistanceCount + 1;
-            //}
-            //Distance = decValue + (DistanceCount * 255);
-            //lastDistanceValue = decValue;
-
-            return Calculations.GetDistance(distanceValue);
-
-        }
-
-        public static double GetDuration(string HexDurationValue) {
-
-            //int decValue = HexToDecimal(HexDurationValue);
-            //if (decValue < lastDurationValue) {
-            //    DurationCount = DurationCount + 1;
-            //}
-            //Duration = decValue + (DurationCount * 255);
-            //lastDurationValue = decValue;
-
-            return Calculations.GetDuration(HexDurationValue);
-
-        }
-    }
-    class Calculations {
-        private static double Distance = 0;
-        private static int DistanceCount = 0;
-        private static int lastDistanceValue;
-
-        private static double Duration = 0;
-        private static int DurationCount = 0;
-        private static int lastDurationValue;
-
-        private static int HexToDecimal(string hexValue) {
-            int decValue = int.Parse(hexValue, System.Globalization.NumberStyles.HexNumber);
-            return decValue;
-
-        }
-
-        public static double GetSpeed(string LSB, string MSB) {
-            string TotalHexValue = LSB + MSB;
-
-            int DecValue = Convert.ToInt32(TotalHexValue, 16);
-            double SpeedInKmH = DecValue * 3.6;
-            return SpeedInKmH;
-        }
-
-
-        public static double GetDistance(string distanceValue) {
-
-            int decValue = HexToDecimal(distanceValue);
-            if (decValue < lastDistanceValue) {
-                DistanceCount = DistanceCount + 1;
+            public override string ToString()
+            {
+                return $"ID: {ID}, Speed: {Speed}, Distance: {Distance}, Time: {Time}, HeartBeat: {HeartBeat}";
             }
-            Distance = decValue + (DistanceCount * 255);
-            lastDistanceValue = decValue;
-
-            return Distance;
-
-        }
-
-        public static double GetDuration(string HexDurationValue) {
-
-            int decValue = HexToDecimal(HexDurationValue);
-            if (decValue < lastDurationValue) {
-                DurationCount = DurationCount + 1;
-            }
-            Duration = decValue + (DurationCount * 255);
-            lastDurationValue = decValue;
-
-            return Duration / 4;
-
         }
     }
 }
