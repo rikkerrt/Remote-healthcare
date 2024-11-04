@@ -167,6 +167,7 @@ namespace FietsDemo
                         if (s.Contains("false"))
                         {
                             sendData = false;
+                            VRConnection.setEmergencyStop(!sendData);
                         }
 
 
