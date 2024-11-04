@@ -106,7 +106,7 @@ namespace ClientProgram
                     speed = 0;
                 }
                 heartBeat = Convert.ToInt32(HeartBeat, 16) - randomHeartBeat;
-                if (heartBeat > 0)
+                if (heartBeat < 0)
                 {
                     heartBeat = 0;
                 }
@@ -174,7 +174,11 @@ namespace ClientProgram
             {
                 Duration = 0;
             }
-           
+        }
+
+        public void sendResistance(int resistance)
+        {
+            Console.WriteLine(resistance);
         }
 
 
@@ -192,7 +196,7 @@ namespace ClientProgram
 
         public string getDuration()
         {
-            return Duration + "";
+            return Duration.ToString("X");
         }
 
         public string getHeartBeat()

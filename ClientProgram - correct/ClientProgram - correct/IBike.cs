@@ -12,5 +12,6 @@ namespace ClientProgram___correct
         string getDistance();
         string getDuration();
         string getHeartBeat();
+        void sendResistance(int resistance);
     }
 }

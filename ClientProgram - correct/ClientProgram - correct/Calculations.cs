@@ -22,10 +22,10 @@ namespace ClientProgram___correct
         public static double GetSpeed(string LSB, string MSB)
         {
             string TotalHexValue = MSB + LSB;
-            Console.WriteLine(TotalHexValue);
+            //Console.WriteLine(TotalHexValue);
 
             int DecValue = Convert.ToInt32(TotalHexValue, 16);
-            Console.WriteLine(DecValue);
+            //Console.WriteLine(DecValue);
             double SpeedInKmH = DecValue * 3.6;
             return SpeedInKmH;
         }
@@ -57,8 +57,13 @@ namespace ClientProgram___correct
             Duration = decValue + (DurationCount * 255);
             lastDurationValue = decValue;
 
-            return (int)Duration;
+            return (int)Duration / 4;
 
+        }
+
+        public static int getHeartBeat(string HeartBeatValue)
+        {
+            return HexToDecimal(HeartBeatValue);
         }
     }
 }

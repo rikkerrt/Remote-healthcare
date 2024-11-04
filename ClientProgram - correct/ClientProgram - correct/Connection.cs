@@ -11,6 +11,7 @@ namespace ClientProgram___correct
         private static string Duration = "00";
         private static string Distance = "00";
         private static string HeartBeat = "00";
+        private static BLE bleBike;
 
 
         public Connection() 
@@ -22,7 +23,7 @@ namespace ClientProgram___correct
         public async void run()
         {
             int errorCode = 0;
-            BLE bleBike = new BLE();
+            bleBike = new BLE();
             BLE bleHeart = new BLE();
             Thread.Sleep(1000); // We need some time to list available devices
 
@@ -107,6 +108,40 @@ namespace ClientProgram___correct
                 }
             }
         }
+
+        public void sendResistance(int resistance)
+        {
+            byte data = 0x00;
+            if (resistance > 200)
+            {
+                data = (byte)200;
+            }
+            else if (resistance < 0)
+            {
+                data = (byte)0;
+            }
+            else
+            {
+                data = (byte)resistance;
+            }
+
+
+            byte[] bytes = { 0xA4, 0x09, 0x4E, 0x05, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, data };  //laatste veranderen 
+
+            byte checkSum = 0x00;
+            for (int i = 0; i < bytes.Length - 1; i++)
+            {
+                checkSum ^= bytes[i];
+            }
+
+            byte[] toSend = new byte[bytes.Length + 1];
+            bytes.CopyTo(toSend, 0);
+            toSend[toSend.Length - 1] = checkSum;
+
+            bleBike.WriteCharacteristic("6e40fec3-b5a3-f393-e0a9-e50e24dcca9e", toSend);
+            Console.WriteLine("done");
+        }
+
         public static void sendResistance(BLE bleBike)
         {
 
