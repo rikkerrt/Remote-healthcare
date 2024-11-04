@@ -2,6 +2,7 @@
 
 namespace ClientProgram___correct
 {
+    
     class Calculations
     {
         private static double distance = 0;

@@ -1,4 +1,4 @@
-﻿using Avans.TI.BLE;
+using Avans.TI.BLE;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -11,6 +11,7 @@ namespace ClientProgram___correct
         private static string duration = "00";
         private static string distance = "00";
         private static string heartBeat = "00";
+        private static int Resistance = 0;
         private static BLE bleBike;
 
         public Connection() 
@@ -78,6 +79,7 @@ namespace ClientProgram___correct
 
         public void sendResistance(int resistance)
         {
+            Resistance = resistance;
             byte data = 0x00;
             if (resistance > 200)
             {
@@ -144,6 +146,11 @@ namespace ClientProgram___correct
         public string getDuration()
         {
             return duration;
+        }
+
+        public int getResistance()
+        {
+            return Resistance;
         }
 
         public string getHeartBeat()

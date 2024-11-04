@@ -7,6 +7,10 @@ using System.Net.Sockets;
 using Newtonsoft.Json;
 using ClientProgram___correct;
 using ClientProgram;
+using ClientProgram___correct;
+using Newtonsoft.Json.Linq;
+using System.Security.Cryptography;
+using System.Web;
 using System.Threading.Tasks;
 
 namespace FietsDemo
@@ -20,12 +24,16 @@ namespace FietsDemo
         //static DataProtocol dataProtocol;
         static bool sendData;
         static string UserName;
+        static string serverKey;
+        static string privateKey;
+        static string publicKey;
 
         public static async Task Main()
         {
 
             Console.Write("Wat is je naam? ");
             UserName = Console.ReadLine();
+            Console.WriteLine("je username ="+UserName);
 
             //IBike sim = new Simulation(3);
             //while (true)
@@ -57,26 +65,33 @@ namespace FietsDemo
                 Console.WriteLine("Connecting.....");
                 tcpclnt.Connect(IPAddress.Loopback, 8001);
                 Console.WriteLine("Connected");
-
                 stm = tcpclnt.GetStream();
-                ASCIIEncoding asen = new ASCIIEncoding();
+                (publicKey, privateKey) = encryption.GenerateKeys();
 
-                stm.Write(asen.GetBytes("f|"+UserName), 0, asen.GetBytes("f|"+UserName).Length);
-                byte[] buffer = new byte[100];
-                //int bytesRead = stm.Read(buffer, 0, buffer.Length);
-                //String Respons = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                //int IntResponse = Convert.ToInt32(Respons);
-                //ID = IntResponse;
+
+                // recieve public key
+                byte[] buffer = new byte[2048];
                 int bytesRead = stm.Read(buffer, 0, buffer.Length);
-                String Respons = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                //int IntResponse = Convert.ToInt32(Respons);
-                ID = Int32.Parse(Respons);
-                //Console.WriteLine("i got id");
+                byte[] result = new byte[bytesRead];
+                Array.Copy(buffer, result, bytesRead);
+                serverKey = Encoding.UTF8.GetString(result);
+
+                // send public key
+                
+                stm.Write(Encoding.ASCII.GetBytes(publicKey), 0, Encoding.ASCII.GetBytes(publicKey).Length);
+
+                // send client id
+                byte[] encryptedMessage = encryption.Encrypt(serverKey, "f|"+ UserName);
+                stm.Write(encryptedMessage, 0, encryptedMessage.Length);
+
+                buffer = new byte[2048];    
+                bytesRead = stm.Read(buffer, 0, buffer.Length);
+                result = new byte[bytesRead];
+                Array.Copy(buffer, result, bytesRead);
+                ID = Int32.Parse(encryption.Decrypt(privateKey, result));
 
                 writer = new StreamWriter(stm);
                 writer.AutoFlush = true;
-
-                //IBike sim = new Simulation(1);
 
                 Thread dataReciever = new Thread(new ThreadStart(RecieveData));
                 dataReciever.Start();
@@ -97,11 +112,14 @@ namespace FietsDemo
                 {
                     if (sendData)
                     {
+                    Console.WriteLine(UserName);
                   
                     Data data = new Data(ID, 15, 16, 10, 76, 8,UserName);
 
                     string input = connection.getSpeed();
                     data.Speed = Calculations.GetSpeed(input.Substring(2), input.Substring(0, 2));
+                    data.Name = UserName;
+                    data.Resistance = sim.getResistance();
                     //Console.WriteLine(data.Speed);
                     data.Distance = Calculations.GetDistance(connection.getDistance());
                     //Console.WriteLine(data.Distance);
@@ -110,9 +128,9 @@ namespace FietsDemo
                     data.HeartBeat = Calculations.getHeartBeat(connection.getHeartBeat());
                     //Console.WriteLine("Heartbeat: " + data.HeartBeat);
 
-                        string jsonData = JsonConvert.SerializeObject(data);
-                    writer.WriteLine(jsonData);
-                    //Console.WriteLine("Data object in JSON sent.");
+                    string jsonData = JsonConvert.SerializeObject(data);
+                    byte[] bytes = encryption.Encrypt(serverKey, jsonData);
+                    stm.Write(bytes, 0, bytes.Length);
 
                     VRConnection.setSpeed(data.Speed);
 
@@ -124,7 +142,7 @@ namespace FietsDemo
             } 
             catch (Exception e) 
             {
-                Console.WriteLine(e.StackTrace);
+                Console.WriteLine(e);
             }
         }
 
@@ -134,12 +152,17 @@ namespace FietsDemo
             {
                 while (true)
                 {
-                    byte[] b = new byte[100];
-                    int k = stm.Read(b, 0, b.Length);
-                    string s = System.Text.Encoding.ASCII.GetString(b);
+                    byte[] buffer = new byte[2048];
+                    int bytesRead = stm.Read(buffer, 0, buffer.Length);
+                    byte[] result = new byte[bytesRead];
+                    Array.Copy(buffer, result, bytesRead);
+
+                    string s = encryption.Decrypt(privateKey, result);
+                    Console.WriteLine(s);
+
                     if (s.StartsWith("sendData"))
                     {
-                        string send = (s.Split(' ')[1]);
+                        string send = (s.Split('|')[1]);
                         if (s.Contains("true"))
                         {
                             sendData = true;
@@ -170,7 +193,7 @@ namespace FietsDemo
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.StackTrace);
+                Console.WriteLine(e);
             }
         }
         

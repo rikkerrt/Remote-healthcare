@@ -15,15 +15,19 @@ namespace ServerProgram___correct
         private Socket Socket;
         private int BikeId;
         private DataStorage DataStorage;
+        private string clientKey;
+        private string serverKey;
 
 
-        public BikeHandler(Socket socket, int bikeId, DataStorage dataStorage)
+        public BikeHandler(Socket socket, int bikeId, DataStorage dataStorage, string clientKey, string serverKey)
         {
             Socket = socket;
             BikeId = bikeId;
+            Console.WriteLine(bikeId);
             DataStorage = dataStorage;
             Console.WriteLine(DataStorage.getHighestID());
-
+            this.clientKey = clientKey;
+            this.serverKey = serverKey;
         }
 
         public void SetDoctorHandler(DoctorHandler doctorHandler)
@@ -36,22 +40,25 @@ namespace ServerProgram___correct
         {
 
             ASCIIEncoding asen = new ASCIIEncoding();
-            Socket.Send(asen.GetBytes(BikeId.ToString()));
+            Socket.Send(encryption.Encrypt(clientKey, BikeId.ToString()));
             while (true)
             {
                 try
                 {
-                    byte[] buffer = new byte[1024];
-                    int receivedBytes = Socket.Receive(buffer);
+                    byte[] buffer = new byte[2048];
+                    int bytesRead = Socket.Receive(buffer);
+                    byte[] result = new byte[bytesRead];
+                    Array.Copy(buffer, result, bytesRead);
 
-                    if (receivedBytes == 0)
+                    if (bytesRead == 0)
                     {
                         Console.WriteLine("De client is gedisconnect.");
                         break;
                     }
 
 
-                    string jsonData = Encoding.ASCII.GetString(buffer, 0, receivedBytes).Trim();
+                    string jsonData = encryption.Decrypt(serverKey, result);
+                    Console.WriteLine(jsonData);
 
                     Data data = JsonConvert.DeserializeObject<Data>(jsonData);
 
