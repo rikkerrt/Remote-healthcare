@@ -6,7 +6,6 @@ namespace ClientProgram
 {
     class Simulation : IBike 
     {
-
         private int Mode;
         private string Speed = "00";
         private string Distance = "00";
@@ -108,7 +107,6 @@ namespace ClientProgram
                     heartBeat = 0;
                 }
             }
-
             Speed = speed.ToString("X");
             Distance = randomDistance.ToString("X");
             HeartBeat = heartBeat.ToString("X");
@@ -152,7 +150,6 @@ namespace ClientProgram
             Distance = fillHex(Distance, 2);
             HeartBeat = fillHex(HeartBeat, 2);
             Duration++;
-
         }
 
         public string fillHex(string value, int max)
@@ -177,9 +174,6 @@ namespace ClientProgram
         {
             Console.WriteLine(resistance);
         }
-
-
-
 
         public string getSpeed()
         {
